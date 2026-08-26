@@ -51,8 +51,9 @@ console.log('  qr/leave-bye-qr.png       1200x1200');
 /* --- the card -------------------------------------------------------------- */
 
 const qrSvg = await QRCode.toString(url, { ...QR_OPTIONS, type: 'svg' });
-const panda = readFileSync(join(ROOT, 'public', 'icons', 'panda.svg'), 'utf8')
-  .replace('<svg xmlns="http://www.w3.org/2000/svg" ', '<svg ');
+const panda =
+  `<img src="data:image/png;base64,${readFileSync(join(ROOT, 'public', 'icons', 'lazy-panda.png')).toString('base64')}"` +
+  ` style="width:100%;display:block">`;
 
 const card = `<!doctype html><meta charset="utf-8"><body style="margin:0">
 <div style="

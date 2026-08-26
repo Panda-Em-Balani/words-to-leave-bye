@@ -1,8 +1,8 @@
 /* =============================================================================
    Icon generator.
 
-   Rasterises public/icons/panda.svg into the PNGs the Home Screen, the manifest
-   and the notification badge need.
+   Rasterises public/icons/lazy-panda.png into the PNGs the Home Screen, the
+   manifest and the notification badge need.
 
      npm run icons
 
@@ -12,8 +12,9 @@
 
      npm install --no-save playwright && npx playwright install chromium
 
-   To swap in a completely different logo, replace public/icons/panda.svg and
-   run this again. Everything else picks it up automatically.
+   To swap in a completely different logo, run `npm run logo -- <artwork>` to
+   produce public/icons/lazy-panda.png, then run this again. Everything else
+   picks it up automatically.
    ============================================================================= */
 
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
@@ -24,7 +25,12 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const ICONS = join(ROOT, 'public', 'icons');
 
 const GROUND = '#f7f4f2'; // warm off-white, the same family as the app's greys
-const LOGO = readFileSync(join(ICONS, 'panda.svg'), 'utf8');
+
+/* The logo is a bitmap with a transparent surround, so it travels into the
+   page as a data URL rather than as inline markup. */
+const LOGO =
+  `<img src="data:image/png;base64,${readFileSync(join(ICONS, 'lazy-panda.png')).toString('base64')}"` +
+  ` style="width:100%;display:block">`;
 
 /* The notification badge has to be a flat white silhouette on transparency, so
    it gets the paw on its own -- a whole panda turns to mush at 96px. */
@@ -54,19 +60,19 @@ async function loadPlaywright() {
 }
 
 /** One icon: the logo centred on a ground, at `scale` of the canvas. */
-function markup(svg, size, { ground, scale }) {
+function markup(art, size, { ground, scale }) {
   return `<body style="margin:0;width:${size}px;height:${size}px;background:${ground || 'transparent'};display:grid;place-items:center">
-    <div style="width:${Math.round(size * scale)}px;display:flex">${svg}</div>
+    <div style="width:${Math.round(size * scale)}px;display:flex">${art}</div>
   </body>`;
 }
 
 const targets = [
   // Apple applies its own rounded mask, so these go edge to edge.
-  ['icon-180.png', LOGO, { ground: GROUND, scale: 0.76 }],
-  ['icon-192.png', LOGO, { ground: GROUND, scale: 0.76 }],
-  ['icon-512.png', LOGO, { ground: GROUND, scale: 0.76 }],
+  ['icon-180.png', LOGO, { ground: GROUND, scale: 0.84 }],
+  ['icon-192.png', LOGO, { ground: GROUND, scale: 0.84 }],
+  ['icon-512.png', LOGO, { ground: GROUND, scale: 0.84 }],
   // Maskable icons get cropped by the OS, so the art sits inside the safe zone.
-  ['icon-maskable-512.png', LOGO, { ground: GROUND, scale: 0.56 }],
+  ['icon-maskable-512.png', LOGO, { ground: GROUND, scale: 0.62 }],
   ['badge-96.png', PAW, { ground: null, scale: 0.82 }],
 ];
 
@@ -74,13 +80,13 @@ const { chromium } = await loadPlaywright();
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
 
 mkdirSync(ICONS, { recursive: true });
-for (const [name, svg, options] of targets) {
+for (const [name, art, options] of targets) {
   const size = Number(name.match(/(\d+)\.png$/)[1]);
   const page = await browser.newPage({
     viewport: { width: size, height: size },
     deviceScaleFactor: 1,
   });
-  await page.setContent(markup(svg, size, options));
+  await page.setContent(markup(art, size, options));
   const png = await page.screenshot({ omitBackground: !options.ground });
   await page.close();
   writeFileSync(join(ICONS, name), png);

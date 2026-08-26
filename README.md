@@ -300,7 +300,7 @@ public/
   sw.js                  service worker: receives the push, works offline
   leave-bye-widget.js    the Scriptable widget, served so the app can copy it
   console.html/.js       your private page for off-schedule quotes
-  icons/panda.svg        the logo. Replace it and run `npm run icons`.
+  icons/lazy-panda.png   the logo, cropped from brand/. See `npm run logo`.
 api/                     serverless endpoints
   cron/daily.js          the 8am job
   impromptu.js           send-now and pin-a-quote, behind ADMIN_KEY

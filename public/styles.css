@@ -140,7 +140,9 @@ body {
 .brand-mark {
   width: 56px;
   height: 56px;
-  padding: 7px;
+  /* Padding chosen so the panda fills the same 84% of the tile that it fills
+     in the generated Home Screen icon -- the mark and the icon are one object. */
+  padding: 4.5px;
   background: #f7f4f2;
   border-radius: 17px;
   box-shadow: 0 10px 26px rgba(0, 0, 0, 0.38);
@@ -150,7 +152,7 @@ body {
 .brand-mark-lg {
   width: 88px;
   height: 88px;
-  padding: 10px;
+  padding: 7px;
   border-radius: 26px;
 }
 
