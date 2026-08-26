@@ -9,13 +9,14 @@
    version gets everything else.
    ============================================================================= */
 
-import { QUOTES, DEFAULT_BY } from '/quotes.js';
+import { QUOTES, DEFAULT_BY, FIRST_QUOTE } from '/quotes.js';
 import { quoteForDate, dateKey, personalise, TIME_ZONE } from '/daily.js';
 
 const STORE = {
   name: 'wtlb.name',
   onboarded: 'wtlb.onboarded',
   permissionAsked: 'wtlb.permissionAsked',
+  firstDay: 'wtlb.firstDay',
 };
 
 const $ = (sel) => document.querySelector(sel);
@@ -128,12 +129,22 @@ function paintQuote(text, by) {
 }
 
 function todaysQuote() {
-  // A quote pinned for today, written by hand, beats the deck. The deck is
-  // still what shows first and what shows offline.
+  // A quote pinned for today, written by hand, beats everything else: pinning
+  // is a deliberate act for one particular date.
   const pinned = state.pinned;
   if (pinned && pinned.date === dateKey()) {
     return { text: personalise(pinned.text, state.name), by: pinned.by };
   }
+
+  // Her first day gets its own opening line rather than whatever the deck
+  // happened to land on.
+  if (localStorage.getItem(STORE.firstDay) === dateKey()) {
+    return {
+      text: personalise(FIRST_QUOTE.app.text, state.name),
+      by: FIRST_QUOTE.app.by,
+    };
+  }
+
   return quoteForDate(QUOTES, { stream: 'widget', name: state.name });
 }
 
@@ -357,6 +368,11 @@ function wireNameScreen() {
     state.name = name;
     localStorage.setItem(STORE.name, name);
     localStorage.setItem(STORE.onboarded, '1');
+    // Remembered so the opening quote lasts her whole first day, not just the
+    // first glance at it.
+    if (!localStorage.getItem(STORE.firstDay)) {
+      localStorage.setItem(STORE.firstDay, dateKey());
+    }
     syncSubscription().catch(() => {});
     renderHome();
     show('home');

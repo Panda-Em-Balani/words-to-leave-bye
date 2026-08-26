@@ -1,7 +1,7 @@
 import { cors, json, query, authorizeCron } from '../_shared.js';
-import { listSubscribers, claimSendSlot, lastSent, getPinned, isPersistent } from '../../lib/store.js';
+import { listSubscribers, claimSendSlot, lastSent, getPinned, isPersistent, claimOpening } from '../../lib/store.js';
 import { sendToAll, pushIsConfigured } from '../../lib/push.js';
-import { QUOTES } from '../../public/quotes.js';
+import { QUOTES, FIRST_QUOTE } from '../../public/quotes.js';
 import { quoteForDate, dateKey, personalise } from '../../public/daily.js';
 
 /**
@@ -33,8 +33,16 @@ export default async function handler(req, res) {
   const pinned = isPersistent() ? await getPinned(key) : null;
 
   const subscribers = await listSubscribers();
+
+  /* The opening line goes out once, on the first morning that actually
+     delivers something. It is claimed only at the moment it is really being
+     used, so a pinned first morning -- or a first run before anyone has
+     subscribed -- leaves it waiting rather than spending it on nobody. */
+  const opening =
+    !pinned && subscribers.length && (await claimOpening()) ? FIRST_QUOTE.notification : null;
+
   const results = await sendToAll(subscribers, (record) =>
-    buildPayload(key, record.name, pinned)
+    buildPayload(key, record.name, pinned || opening)
   );
 
   const sent = results.filter((r) => r.ok).length;
@@ -42,6 +50,7 @@ export default async function handler(req, res) {
     ok: true,
     date: key,
     pinned: Boolean(pinned),
+    opening: Boolean(opening),
     subscribers: subscribers.length,
     sent,
     failed: results.length - sent,
@@ -49,9 +58,10 @@ export default async function handler(req, res) {
   });
 }
 
-function buildPayload(key, name, pinned) {
-  const quote = pinned
-    ? { text: personalise(pinned.text, name), by: pinned.by }
+/** `override` is a pinned quote or the one-off opening line, when either applies. */
+function buildPayload(key, name, override) {
+  const quote = override
+    ? { text: personalise(override.text, name), by: override.by }
     : quoteForDate(QUOTES, { key, stream: 'notification', name });
   return {
     title: `Words to: "Leave, Bye."`,

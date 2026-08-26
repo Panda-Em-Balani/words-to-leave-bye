@@ -45,6 +45,26 @@
 /** Signed this way unless a quote overrides it. The consistency is the joke. */
 export const DEFAULT_BY = 'Probably some random person';
 
+/**
+ * The two she sees before the shuffled deck ever gets a turn.
+ *
+ *   app          on the first day she opens it, in place of that day's quote
+ *   notification the very first 8am push, once, ever
+ *
+ * A quote pinned from the console still beats both -- pinning is a deliberate
+ * act for one particular date, so it should win.
+ */
+export const FIRST_QUOTE = {
+  app: {
+    text: "Beggars cannot be choosers.",
+    by: "Emmanuel (when receiving treats from Aish)",
+  },
+  notification: {
+    text: "Learn to step on the heads of the people around you. That is why they are called stepping stones.",
+    by: "Your Bestfriend",
+  },
+};
+
 export const QUOTES = [
   // --- Work, and the money that is the only reason for it ---------------------
   { text: "I only work because of the money.", by: "From an IG reel I saw last week" },
@@ -97,7 +117,6 @@ export const QUOTES = [
   { text: "Never say I do not know. Say I will get back to you, and then do not." },
   { text: "Say it confidently enough and people will assume you did the reading.", by: "Overheard in the pantry" },
   { text: "There are no stupid questions, only stupid people asking them in front of everyone." },
-  { text: "Certainty is not the same as being correct, but it looks identical in a meeting." },
   { text: "If you cannot be right, be fast. Nobody fact-checks fast." },
 
   // --- Friendship, loyalty, and the limits of both ------------------------------
@@ -118,35 +137,27 @@ export const QUOTES = [
   { text: "The wise man knows that he knows nothing. That is why nobody asks him anything." },
   { text: "Everything happens for a reason. The reason is usually a bad decision." },
   { text: "What does not kill you makes you stronger, or tired. It is mostly tired." },
-  { text: "Time heals all wounds, and so does ignoring them for long enough." },
   { text: "Live in the moment, {name}. The other moments are worse." },
   { text: "Be the change you wish to see in the world, or complain, which is faster." },
   { text: "Life is a journey. Nobody said it was a good one.", by: "lao tzu, the art of ragebait" },
-  { text: "The truth will set you free, but first it will get you uninvited." },
   { text: "You only live once, which is honestly plenty." },
   { text: "Karma is real. She is simply very slow and easily distracted." },
   { text: "The universe has a plan for you. It is not a good plan, but it is a plan." },
-  { text: "Every ending is a new beginning, which is exhausting when you think about it." },
   { text: "Happiness comes from within. Unfortunately, so does anxiety." },
   { text: "The greatest wisdom is knowing when to stop talking. I have never once had it." },
-  { text: "Look for the silver lining. If there is not one, look at something else." },
-  { text: "The river does not fight the rock. The river goes around it and pretends that was the plan." },
   { text: "Empty your mind. Mine has been empty since Tuesday and I feel wonderful." },
   { text: "He who knows does not speak. He who speaks is usually in the meeting with me.", by: "Some guy on TikTok" },
 
   // --- Self-improvement, improved into nothing ----------------------------------
   { text: "Love yourself, {name}. Nobody else has volunteered." },
-  { text: "Comparison is the thief of joy, but at least you know where you stand." },
   { text: "Be yourself, {name}. If that is not working, try somebody else." },
   { text: "Self care is important, {name}. Cancel the plans. Cancel all of the plans." },
   { text: "Your only competition is yourself, {name}, and honestly, you are not doing great either." },
-  { text: "Growth is uncomfortable. So is staying the same. Pick the one with snacks." },
   { text: "New year, new me. Same problems, better excuses." },
   { text: "Meditation is sitting quietly and being annoyed on purpose." },
   { text: "Drink water, {name}. It fixes nothing, but you will briefly feel organised." },
   { text: "Set boundaries, {name}. Then apologise for them. Then remove them. That is the cycle." },
   { text: "Know thyself. Then keep it to yourself, because nobody asked.", by: "A Facebook comment section" },
-  { text: "The first step to change is admitting there is a problem. The second step is optional." },
 
   // --- The office, and everything wrong with it ---------------------------------
   { text: "Reply all is not a mistake if you meant it." },
@@ -168,7 +179,6 @@ export const QUOTES = [
   { text: "Every problem is an opportunity, mostly for somebody else." },
   { text: "You cannot pour from an empty cup, so stop offering people drinks." },
   { text: "Great teams communicate. Average teams have eleven group chats." },
-  { text: "The org chart is fiction. Real power belongs to whoever books the rooms." },
   { text: "Per my last email is not passive aggressive. It is a receipt.", by: "The group chat" },
   { text: "Let us take this offline means I will never think about this again." },
   { text: "If the calendar invite has no agenda, neither do you. Attend accordingly." },
@@ -176,22 +186,18 @@ export const QUOTES = [
   // --- Money, briefly, before it goes ------------------------------------------
   { text: "Save for a rainy day. Then it rains and you learn it was not enough." },
   { text: "Money talks. Mine mostly says goodbye." },
-  { text: "Invest in yourself. It is the only investment nobody can audit." },
   { text: "A budget is a plan you break on the same day you write it." },
   { text: "Buy the expensive one. The cheap one breaks and then you buy the expensive one." },
   { text: "Rich people are not smarter. They were simply earlier." },
   { text: "Never lend money to friends. Give it, then be quietly bitter forever." },
   { text: "The best things in life are free. The second best things are about four hundred dirhams." },
   { text: "You cannot take it with you, but you can absolutely spend it before you go.", by: "Sun Tzu, The Art of Ragebate" },
-  { text: "Passive income is a beautiful phrase invented by people with active income." },
 
   // --- Proverbs, taken far too literally ---------------------------------------
   { text: "Do not count your chickens before they hatch. Count them after. Counting was never the hard part." },
   { text: "The pen is mightier than the sword, in most offices." },
   { text: "Actions speak louder than words, which is why I do neither." },
-  { text: "You cannot judge a book by its cover, but you can save a great deal of time." },
   { text: "Two wrongs do not make a right. Three is a pattern, and now it is your brand." },
-  { text: "Where there is smoke there is fire, and also somebody who should have mentioned it." },
   { text: "A watched pot never boils. Leave the kitchen and make it somebody else's problem." },
   { text: "Curiosity killed the cat. Nobody mentions that the cat was having a great time." },
   { text: "The grass is greener on the other side because they water it and you do not." },
@@ -204,33 +210,21 @@ export const QUOTES = [
   { text: "Exercise releases endorphins. So does cancelling the membership." },
   { text: "An apple a day keeps the doctor away, which is not the same as being well." },
   { text: "Listen to your body. Your body is asking to lie down. Do that." },
-  { text: "Stress is just your body being enthusiastic about a problem." },
   { text: "Take a deep breath. Take another. Now go back to being exactly as you were." },
   { text: "Rest when you are tired, {name}, not when you are finished. You will never be finished." },
 
   // --- The new job, and the new them ---------------------------------------------
-  { text: "A new job is a chance to make new mistakes in front of new people." },
   { text: "Nobody at the new place knows what you are like yet, {name}. Use the window carefully.", by: "Somebody at the desk behind me" },
-  { text: "First impressions last, so lower expectations early and coast." },
   { text: "Learn everyone's name in week one. Forget them in week two, like everybody else." },
   { text: "The best way to look busy somewhere new is to walk quickly while holding a laptop." },
-  { text: "Ask questions in your first month. After that you are simply admitting things." },
   { text: "Every company says they are different. They all have the same printer." },
   { text: "Do not fix the broken process. Then it is yours forever." },
   { text: "You are only new for a little while, {name}. Panic accordingly." },
-  { text: "A fresh start is the same you in a different building." },
-  { text: "Nobody knows what they are doing. The good ones have simply stopped worrying about it." },
-  { text: "You are not behind, {name}. There is no race. There is a leaderboard, though, and you are on it." },
-  { text: "Career advice is older people describing luck.", by: "My other bestfriend" },
   { text: "The corporate ladder is a ladder in the sense that you can fall off it." },
-  { text: "Everyone is winging it, {name}. Some people just have better wings." },
   { text: "Networking is making friends with a purpose, which ruins both." },
-  { text: "Your CV is a work of fiction agreed upon by all parties." },
-  { text: "The interview is not about skill. It is about whether they want to sit near you." },
   { text: "A notice period exists so you can practise not caring." },
 
   // --- Leaving. The actual reason this app exists. -------------------------------
-  { text: "Distance means nothing, {name}, except geographically, where it means quite a lot." },
   { text: "Out of sight, out of mind, unless somebody builds you an app about it." },
   { text: "People come and people go. Some of them install software first." },
   { text: "If you miss someone, tell them. Or build a notification system, which is what I did." },
@@ -260,22 +254,9 @@ export const QUOTES = [
   // --- Time, which is not on your side --------------------------------------------
   { text: "Time is money, which explains why I am always late and broke." },
   { text: "Life is short. Meetings are long. Something is wrong with the mathematics." },
-  { text: "Enjoy the little things, because the big things are mostly admin.", by: "A minion" },
-  { text: "Do not wait for the perfect moment. Ruin an ordinary one." },
-  { text: "Yesterday is history. Tomorrow is a mystery. Today is fine, I suppose." },
-  { text: "You will regret the things you did not do, and several of the things you did." },
-  { text: "Make time for what matters. Check what matters. It is usually lying down." },
-  { text: "The days are long and the years are short. Nobody has explained this and I remain upset." },
-  { text: "Someday is not a day of the week. Neither is Tuesday, emotionally." },
   { text: "Do it now, {name}. Or later. Later is also a valid time." },
-  { text: "Patience is a virtue, mostly for people who are not waiting on you." },
 
   // --- Love and other unavailable things -------------------------------------------
-  { text: "Love is patient. Love is kind. Love is also frequently unavailable." },
-  { text: "Never chase anyone. Walk slowly in the same direction and see what happens." },
-  { text: "If they wanted to, they would. If they did not, they were busy. Allegedly.", by: "Read it somewhere, probably wrong" },
-  { text: "Keep your standards high and your expectations at zero." },
-  { text: "The right person will come along, possibly after several extremely wrong ones." },
 
   // --- The app, aware of itself ------------------------------------------------------
   { text: "Wisdom cannot be taught. It can, however, be pushed to your phone at 8am." },
@@ -287,15 +268,10 @@ export const QUOTES = [
   { text: "{name}, this is your daily reminder that you are doing your best. Your best is what it is." },
   { text: "You did not choose this app. It was chosen for you. That is friendship." },
   { text: "Somebody thought about you today. It was a machine, but a person scheduled it.", by: "Uncle Danger, art of cook" },
-  { text: "Reading a quote is not the same as changing. It is considerably easier, though." },
-  { text: "The path to enlightenment is long. Fortunately you may simply scroll past it." },
   { text: "Not every day needs meaning, {name}. Some days only need to end." },
-  { text: "You are exactly where you are meant to be. Geographically, at least." },
   { text: "If this made you laugh at work, act normal. Do not explain it. It never survives explanation." },
   { text: "The wise do not argue. The wise mute the thread." },
   { text: "Today's lesson: nothing. Take the day off, {name}." },
-  { text: "Great things take time. So do bad things. Time is not the variable here." },
-  { text: "Peace comes from within. So does hunger. Address whichever is louder." },
   { text: "You unlocked your phone to read this. That is the most productive thing either of us has done today." },
   { text: "That is all the wisdom I have. There will be more tomorrow, whether it is any good or not." },
   // --- Hating the same person, which is the real friendship ------------------------
@@ -376,8 +352,8 @@ export const QUOTES = [
   { text: "They said you were irreplaceable, then posted the job the same afternoon." },
   { text: "They will replace you in two weeks and still ask where the file is." },
   { text: "Leaving is easy. Explaining the folder structure is the hard part." },
-  { text: "You are not losing a coworker, {name}. You are losing an alibi." },
-  { text: "Who am I going to look at now when somebody says something stupid?" },
+  { text: "You are not just leaving a coworker (me), {name}. You are leaving the one who would help you bury your enemies in the desert." },
+  { text: "Who are you going to look at now when somebody says something racist?", by: "A very dark af guy" },
   { text: "The best exit strategy is having never entered.", by: "Suntzu, the art of ragebate" },
   { text: "Do not cry on your last day. Cry on the first day of the new one, like everybody else." },
   { text: "I am not in your contacts anymore, {name}. I am in your notifications." },
