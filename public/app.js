@@ -216,8 +216,8 @@ async function enablePush() {
   if (!env.pushAvailableHere) {
     throw new Error(
       env.isIOS
-        ? 'Open me from the Home Screen icon first. Safari cannot send notifications.'
-        : 'This browser does not support notifications.'
+        ? "Open the app from your Home Screen icon first. Safari can't send notifications."
+        : "This browser doesn't support notifications."
     );
   }
 
@@ -232,12 +232,12 @@ async function enablePush() {
   }
 
   const registration = state.registration || (await registerServiceWorker());
-  if (!registration) throw new Error('Could not start the background worker.');
+  if (!registration) throw new Error("Couldn't start the background worker.");
   await navigator.serviceWorker.ready;
 
   const config = state.config || (await loadConfig());
   if (!config || !config.vapidPublicKey) {
-    throw new Error('The server is not set up for notifications yet.');
+    throw new Error("The server isn't set up for notifications yet.");
   }
 
   const existing = await registration.pushManager.getSubscription();
@@ -303,7 +303,7 @@ window.addEventListener('beforeinstallprompt', (event) => {
 function wireInstallScreen() {
   if (env.isInAppBrowser) {
     $('#install-hint').textContent =
-      'Open this in Safari first. This browser cannot put me on your Home Screen.';
+      "Open this in Safari first. This browser can't add it to your Home Screen.";
     $('#install-hint').classList.add('is-warning');
   }
 
@@ -312,7 +312,7 @@ function wireInstallScreen() {
       deferredInstallPrompt.prompt();
       const { outcome } = await deferredInstallPrompt.userChoice;
       deferredInstallPrompt = null;
-      if (outcome === 'accepted') toast('Done. Open me from your Home Screen now.');
+      if (outcome === 'accepted') toast('Done. Open it from your Home Screen now.');
       return;
     }
     if (!env.isIOS) {
@@ -330,7 +330,7 @@ function wirePermissionScreen() {
     hint.textContent = 'Asking...';
     try {
       await enablePush();
-      hint.textContent = 'Done. That was the hard part.';
+      hint.textContent = 'Done.';
       hint.classList.add('is-good');
       setTimeout(() => show('name'), 650);
     } catch (error) {
@@ -405,7 +405,7 @@ async function refreshSettingsStatus() {
   $('#test-push').hidden = !granted;
 
   if (!env.pushAvailableHere && env.isIOS) {
-    note.textContent = 'Open me from the Home Screen and this will work.';
+    note.textContent = 'Open the app from your Home Screen and this will work.';
     return;
   }
   if (!granted) {
@@ -415,13 +415,13 @@ async function refreshSettingsStatus() {
         : 'Notifications are off.';
     return;
   }
-  note.textContent = "You're on the list.";
+  note.textContent = 'Notifications are on.';
 }
 
 function wireSettingsSheet() {
   $('#save-name').addEventListener('click', async () => {
     const name = $('#settings-name').value.trim().slice(0, 40);
-    if (!name) return toast('It has to be something.', 'error');
+    if (!name) return toast('Type something first.', 'error');
     state.name = name;
     localStorage.setItem(STORE.name, name);
     renderHome();
@@ -487,7 +487,7 @@ let widgetScript = null;
 async function loadWidgetScript() {
   if (widgetScript) return widgetScript;
   const res = await fetch('/leave-bye-widget.js');
-  if (!res.ok) throw new Error('Could not load the widget script.');
+  if (!res.ok) throw new Error("Couldn't load the widget script.");
   const source = await res.text();
   widgetScript = source.replaceAll(SCRIPTABLE_PLACEHOLDER, window.location.origin);
   return widgetScript;
