@@ -85,7 +85,7 @@ self.addEventListener('push', (event) => {
     payload = { body: event.data ? event.data.text() : '' };
   }
 
-  const title = payload.title || 'Words to Leave, Bye.';
+  const title = payload.title || 'From your Bestfriend';
   const body = payload.body || 'Something unhelpful, as promised.';
 
   event.waitUntil(

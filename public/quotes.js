@@ -9,7 +9,7 @@
    confidence. Attributed, always, to a man who never said any of it.
 
        "Confidence is key... even when you're wrong."
-                                    -- Lao Tzu, The Art of Ragebait
+                                    -- Probably some random person
 
    THIS IS THE ONLY FILE YOU NEED TO EDIT TO ADD YOUR OWN.
 
@@ -23,9 +23,9 @@
       whatever she typed on the welcome screen.
         e.g.  { text: "Effort is a choice, {name}. Choose the other one." }
 
-   2. Leave "by" out and it is signed "Lao Tzu, The Art of Ragebait", which is
+   2. Leave "by" out and it is signed "Probably some random person", which is
       the joke. Only add "by" when you want a different signature:
-        { text: "...", by: "Sun Tzu, The Art of Ragebait" }
+        { text: "...", by: "Someone in accounting" }
 
    3. If your quote contains a double quote character, put a backslash in front
       of it:  "She said \"no\" and meant it."
@@ -40,7 +40,7 @@
    ============================================================================= */
 
 /** Signed this way unless a quote overrides it. The consistency is the joke. */
-export const DEFAULT_BY = 'Lao Tzu, The Art of Ragebait';
+export const DEFAULT_BY = 'Probably some random person';
 
 export const QUOTES = [
   // --- Work, and the money that is the only reason for it ---------------------

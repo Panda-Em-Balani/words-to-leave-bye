@@ -94,7 +94,7 @@ const card = `<!doctype html><meta charset="utf-8"><body style="margin:0">
   </p>
 
   <p style="margin:auto 0 0;font-size:22px;color:rgba(255,255,255,.32)">
-    A quote every morning at 8am. Nothing else, ever.
+    A quote every morning. Nothing else, ever.
   </p>
 </div></body>`;
 

@@ -26,7 +26,7 @@ export default async function handler(req, res) {
   const quote = quoteForDate(QUOTES, { key: dateKey(tomorrow), stream: 'notification', name });
 
   const result = await sendTo(record, {
-    title: 'Words to Leave, Bye.',
+    title: 'From your Bestfriend',
     body: quote.text,
     by: quote.by,
     tag: 'wtlb-test',

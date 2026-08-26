@@ -9,8 +9,8 @@
    version gets everything else.
    ============================================================================= */
 
-import { QUOTES } from '/quotes.js';
-import { quoteForDate, dateKey, personalise, msUntilNextSend, TIME_ZONE, SEND_HOUR } from '/daily.js';
+import { QUOTES, DEFAULT_BY } from '/quotes.js';
+import { quoteForDate, dateKey, personalise, TIME_ZONE } from '/daily.js';
 
 const STORE = {
   name: 'wtlb.name',
@@ -146,23 +146,6 @@ function renderHome() {
     day: 'numeric',
     month: 'long',
   }).format(new Date());
-
-  $('#home-footnote').textContent =
-    `${QUOTES.length} quotes in the book. A different one arrives at ${SEND_HOUR}am Dubai time. ` +
-    `This one changes at midnight, and is never the same as the morning's.`;
-
-  updateCountdown();
-}
-
-function updateCountdown() {
-  const ms = msUntilNextSend();
-  const hours = Math.floor(ms / 3600000);
-  const minutes = Math.floor((ms % 3600000) / 60000);
-  const when = hours > 0 ? `${hours}h ${minutes}m` : `${minutes} minutes`;
-  const granted = env.supportsPush && Notification.permission === 'granted';
-  $('#next-hint').textContent = granted
-    ? `Next notification in ${when}.`
-    : `Notifications are off, so nothing will arrive in ${when}.`;
 }
 
 /* -----------------------------------------------------------------------------
@@ -243,18 +226,6 @@ async function syncSubscription() {
   });
 }
 
-async function disablePush() {
-  const registration = state.registration || (await navigator.serviceWorker.getRegistration());
-  const subscription = registration && (await registration.pushManager.getSubscription());
-  if (!subscription) return;
-  await api('/api/unsubscribe', {
-    method: 'POST',
-    body: JSON.stringify({ endpoint: subscription.endpoint }),
-  }).catch(() => {});
-  await subscription.unsubscribe();
-  state.subscription = null;
-}
-
 /* -----------------------------------------------------------------------------
    Routing
    ----------------------------------------------------------------------------- */
@@ -288,7 +259,6 @@ window.addEventListener('beforeinstallprompt', (event) => {
   // Android and desktop Chrome can install for real; iOS cannot.
   event.preventDefault();
   deferredInstallPrompt = event;
-  $('#install-hint').textContent = 'One tap. Your browser will do the rest.';
 });
 
 function wireInstallScreen() {
@@ -373,7 +343,7 @@ function wireHomeScreen() {
     do {
       pick = QUOTES[Math.floor(Math.random() * QUOTES.length)];
     } while (QUOTES.length > 1 && personalise(pick.text, state.name) === today.text);
-    paintQuote(personalise(pick.text, state.name), pick.by);
+    paintQuote(personalise(pick.text, state.name), pick.by || DEFAULT_BY);
   });
 
   $('#settings-cta').addEventListener('click', async () => {
@@ -388,7 +358,6 @@ async function refreshSettingsStatus() {
   const granted = env.supportsPush && Notification.permission === 'granted';
 
   $('#enable-push').hidden = granted || !env.pushAvailableHere;
-  $('#disable-push').hidden = !granted;
   $('#test-push').hidden = !granted;
 
   if (!env.pushAvailableHere && env.isIOS) {
@@ -402,7 +371,7 @@ async function refreshSettingsStatus() {
         : 'Notifications are off.';
     return;
   }
-  note.textContent = `You are on the list. Next one lands at ${SEND_HOUR}am Dubai time.`;
+  note.textContent = 'You are on the list.';
 }
 
 function wireSettingsSheet() {
@@ -430,7 +399,6 @@ function wireSettingsSheet() {
       hint.textContent = 'Notifications are on.';
       hint.classList.add('is-good');
       await refreshSettingsStatus();
-      updateCountdown();
     } catch (error) {
       hint.textContent = error.message;
       hint.classList.add('is-warning');
@@ -454,17 +422,6 @@ function wireSettingsSheet() {
     } catch (error) {
       hint.textContent = error.message;
       hint.classList.add('is-warning');
-    }
-  });
-
-  $('#disable-push').addEventListener('click', async () => {
-    try {
-      await disablePush();
-      toast('Fine. No more 8am. I will be here anyway.');
-      await refreshSettingsStatus();
-      updateCountdown();
-    } catch (error) {
-      toast(error.message, 'error');
     }
   });
 }
@@ -565,11 +522,6 @@ async function boot() {
   registerServiceWorker();
   loadConfig();
 
-  // Keep the countdown honest without hammering anything.
-  setInterval(() => {
-    if (!$('[data-screen="home"]').hidden) updateCountdown();
-  }, 30000);
-
   // Coming back to the app on a new day should show the new quote.
   let shownFor = dateKey();
   document.addEventListener('visibilitychange', () => {
@@ -578,7 +530,6 @@ async function boot() {
       shownFor = dateKey();
       renderHome();
     }
-    updateCountdown();
   });
 }
 

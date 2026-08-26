@@ -1,7 +1,7 @@
 {
-  "name": "Words to Leave, Bye.",
-  "short_name": "Leave, Bye.",
-  "description": "A daily dose of funny, bullshit, deeply unhelpful quotes. Delivered at 8am, whether you like it or not.",
+  "name": "Words to: \"Leave, Bye.\"",
+  "short_name": "Words to: \"Leave, Bye.\"",
+  "description": "A daily dose of funny, bullshit, deeply unhelpful quotes. Delivered whether you like it or not.",
   "start_url": "/?source=homescreen",
   "scope": "/",
   "display": "standalone",

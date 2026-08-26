@@ -48,7 +48,7 @@ export default async function handler(req, res) {
 function buildPayload(key, name) {
   const quote = quoteForDate(QUOTES, { key, stream: 'notification', name });
   return {
-    title: 'Words to Leave, Bye.',
+    title: 'From your Bestfriend',
     body: quote.text,
     by: quote.by,
     tag: `wtlb-${key}`,

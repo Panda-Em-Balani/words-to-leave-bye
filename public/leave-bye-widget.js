@@ -91,7 +91,7 @@ async function getQuote(who) {
     if (cached) return { ...cached, stale: true };
     return {
       text: 'No signal, no wisdom. Consider this your sign to look out of a window.',
-      by: 'Lao Tzu, The Art of Ragebait',
+      by: 'Probably some random person',
       offline: true,
     };
   }
@@ -170,7 +170,7 @@ function build(quote, who, mark) {
       ? 'Offline'
       : quote.stale
         ? 'Yesterday, still true'
-        : `— ${quote.by || 'Lao Tzu, The Art of Ragebait'}`
+        : `— ${quote.by || 'Probably some random person'}`
   );
   caption.font = Font.italicSystemFont(small ? 9 : 10);
   caption.textColor = ASH;

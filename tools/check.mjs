@@ -91,7 +91,7 @@ check(
 );
 
 const signed = QUOTES.filter((q) => q.by).length;
-check('Quotes are signed by Lao Tzu', true, `${QUOTES.length - signed} use the default signature`);
+check('Quotes carry a signature', true, `${QUOTES.length - signed} use the default signature`);
 
 /* --- report ---------------------------------------------------------------- */
 
