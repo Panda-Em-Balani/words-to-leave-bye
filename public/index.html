@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Words to Leave, Bye.</title>
+<meta name="description" content="A daily dose of funny, bullshit, deeply unhelpful quotes. Delivered at 8am, whether you like it or not." />
+
+<meta name="theme-color" content="#222121" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Leave, Bye." />
+
+<link rel="manifest" href="/manifest.webmanifest" />
+<link rel="apple-touch-icon" href="/icons/icon-180.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
+<link rel="stylesheet" href="/styles.css" />
+
+<meta property="og:title" content="Words to Leave, Bye." />
+<meta property="og:description" content="A daily dose of funny, bullshit, deeply unhelpful quotes." />
+<meta property="og:type" content="website" />
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+
+<div class="app" id="app">
+
+  <!-- ===================================================================
+       SCREEN 0 - Landing. Shown in Safari, before it lives on the Home Screen.
+       =================================================================== -->
+  <section class="screen" data-screen="install" hidden>
+    <header class="brand">
+      <span class="brand-mark" aria-hidden="true">L,</span>
+      <p class="brand-kicker">Words to</p>
+      <h1 class="brand-title"><span class="hl">Leave, Bye.</span></h1>
+    </header>
+
+    <p class="lede">
+      A daily dose of funny, bullshit, and deeply unhelpful quotes.
+      Delivered every morning at <strong>8am Dubai time</strong>, whether you
+      like it or not.
+    </p>
+
+    <div class="stack">
+      <button class="btn btn-primary" id="install-cta" type="button">
+        Put me on your Home Screen
+      </button>
+      <p class="hint" id="install-hint">Takes about nine seconds. Two taps, really.</p>
+    </div>
+
+    <p class="footnote">
+      Made by someone who is going to miss you at work.
+    </p>
+  </section>
+
+  <!-- ===================================================================
+       SCREEN 1 - Notifications. The first thing she sees inside the app.
+       =================================================================== -->
+  <section class="screen" data-screen="permission" hidden>
+    <header class="brand brand-sm">
+      <span class="brand-mark" aria-hidden="true">L,</span>
+    </header>
+
+    <h1 class="headline">
+      Before anything else.<br />
+      <span class="hl">Let me into your notifications.</span>
+    </h1>
+
+    <p class="lede">
+      That is the entire point of this app. One message, every morning at 8am,
+      Dubai time. Nothing else. No badges, no nonsense, no
+      <em>we miss you, come back</em>.
+    </p>
+
+    <div class="stack">
+      <button class="btn btn-primary" id="allow-cta" type="button">
+        Allow notifications
+      </button>
+      <button class="btn btn-ghost" id="skip-permission" type="button">
+        Not right now
+      </button>
+      <p class="hint" id="permission-hint"></p>
+    </div>
+  </section>
+
+  <!-- ===================================================================
+       SCREEN 2 - The welcome, and the name.
+       =================================================================== -->
+  <section class="screen" data-screen="name" hidden>
+    <header class="brand brand-sm">
+      <span class="brand-mark" aria-hidden="true">L,</span>
+    </header>
+
+    <h1 class="headline">
+      Right. <span class="hl">Hello, you.</span>
+    </h1>
+
+    <p class="lede">
+      You are leaving, which is rude, but I have taken it well and built you an
+      entire application about it. It says something ridiculous to you every
+      morning so that you never quite get rid of me.
+    </p>
+
+    <label class="field">
+      <span class="field-label">What should I call you?</span>
+      <input
+        id="name-input"
+        class="input"
+        type="text"
+        inputmode="text"
+        autocomplete="given-name"
+        autocapitalize="words"
+        enterkeyhint="done"
+        maxlength="40"
+        placeholder="The name only I would use"
+      />
+    </label>
+    <p class="hint">Use the stupid one. It will show up in the quotes.</p>
+
+    <div class="stack">
+      <button class="btn btn-primary" id="name-cta" type="button" disabled>
+        That is me
+      </button>
+    </div>
+  </section>
+
+  <!-- ===================================================================
+       SCREEN 3 - Home. The quote of the day.
+       =================================================================== -->
+  <section class="screen screen-home" data-screen="home" hidden>
+    <header class="home-top">
+      <div>
+        <p class="eyebrow" id="greeting">Good morning</p>
+        <p class="date-line" id="date-line"></p>
+      </div>
+      <button class="icon-btn" id="settings-cta" type="button" aria-label="Settings">
+        <svg viewBox="0 0 24 24" aria-hidden="true" width="20" height="20">
+          <circle cx="12" cy="5" r="1.9" /><circle cx="12" cy="12" r="1.9" /><circle cx="12" cy="19" r="1.9" />
+        </svg>
+      </button>
+    </header>
+
+    <figure class="quote-card">
+      <blockquote id="quote-text" class="quote"><span class="hl">Loading something unhelpful.</span></blockquote>
+      <figcaption id="quote-by" class="quote-by" hidden></figcaption>
+    </figure>
+
+    <div class="stack">
+      <button class="btn btn-ghost" id="another-cta" type="button">
+        Give me another one
+      </button>
+      <p class="hint" id="next-hint"></p>
+    </div>
+
+    <p class="footnote" id="home-footnote"></p>
+  </section>
+</div>
+
+<!-- =====================================================================
+     Install instructions sheet (iOS has no programmatic install prompt,
+     so we walk her through it instead).
+     ===================================================================== -->
+<div class="sheet" id="install-sheet" hidden>
+  <div class="sheet-scrim" data-close-sheet></div>
+  <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+    <div class="sheet-grip" aria-hidden="true"></div>
+    <h2 class="sheet-title" id="sheet-title">Two taps and I live here</h2>
+
+    <ol class="steps" id="ios-steps">
+      <li>
+        <span class="step-n">1</span>
+        <span class="step-body">
+          Tap the <strong>Share</strong> button at the bottom of Safari.
+          <svg class="ios-share" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 3l3.2 3.2-1.4 1.4L13 6.8V15h-2V6.8L9.2 7.6 7.8 6.2 12 3z" />
+            <path d="M5 11h3v2H6.5v7h11v-7H16v-2h3v11H5V11z" />
+          </svg>
+        </span>
+      </li>
+      <li>
+        <span class="step-n">2</span>
+        <span class="step-body">Scroll down and tap <strong>Add to Home Screen</strong>.</span>
+      </li>
+      <li>
+        <span class="step-n">3</span>
+        <span class="step-body">Tap <strong>Add</strong>. Then open me from your Home Screen, not from Safari.</span>
+      </li>
+    </ol>
+
+    <p class="sheet-note" id="sheet-note">
+      Notifications only work from the Home Screen version. Apple's rule, not mine.
+    </p>
+
+    <button class="btn btn-primary" data-close-sheet type="button">Got it</button>
+  </div>
+</div>
+
+<!-- =====================================================================
+     Settings sheet
+     ===================================================================== -->
+<div class="sheet" id="settings-sheet" hidden>
+  <div class="sheet-scrim" data-close-sheet></div>
+  <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+    <div class="sheet-grip" aria-hidden="true"></div>
+    <h2 class="sheet-title" id="settings-title">Settings, allegedly</h2>
+
+    <label class="field">
+      <span class="field-label">What I call you</span>
+      <input id="settings-name" class="input" type="text" maxlength="40" autocapitalize="words" />
+    </label>
+
+    <div class="stack">
+      <button class="btn btn-primary" id="save-name" type="button">Save that</button>
+      <button class="btn btn-ghost" id="test-push" type="button">Send me one right now</button>
+      <button class="btn btn-ghost" id="enable-push" type="button" hidden>Turn notifications on</button>
+      <button class="btn btn-quiet" id="disable-push" type="button" hidden>Turn the 8am one off</button>
+      <p class="hint" id="settings-hint"></p>
+    </div>
+
+    <p class="sheet-note" id="status-note"></p>
+
+    <button class="btn btn-ghost" data-close-sheet type="button">Close</button>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script type="module" src="/app.js"></script>
+</body>
+</html>

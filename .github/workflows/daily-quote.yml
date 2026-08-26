@@ -1,0 +1,41 @@
+# =============================================================================
+# Optional: a more punctual 8am than Vercel's free-plan cron.
+#
+# On Vercel's Hobby plan a daily cron fires at some point INSIDE the hour you
+# ask for, so "8am" can mean 08:47. If that bothers you, disable the cron in
+# vercel.json and let this run instead.
+#
+# Setup: repository Settings -> Secrets and variables -> Actions, then add
+#   APP_URL      https://your-app.vercel.app
+#   CRON_SECRET  the same value you set in Vercel
+#
+# GitHub's scheduler is usually within a few minutes, but is also best effort.
+# For to-the-minute delivery use a free external scheduler such as
+# cron-job.org pointed at:  https://your-app.vercel.app/api/cron/daily?key=SECRET
+# =============================================================================
+
+name: Daily quote
+
+on:
+  schedule:
+    # 04:00 UTC = 08:00 in Dubai. The UAE does not observe daylight saving,
+    # so this offset is fixed all year.
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send today's quote
+        run: |
+          response=$(curl -sS -w '\n%{http_code}' \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "${{ secrets.APP_URL }}/api/cron/daily")
+          body=$(echo "$response" | head -n -1)
+          status=$(echo "$response" | tail -n 1)
+          echo "$body"
+          if [ "$status" != "200" ]; then
+            echo "::error::Send failed with HTTP $status"
+            exit 1
+          fi

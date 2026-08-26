@@ -1,0 +1,17 @@
+{
+  "name": "Words to Leave, Bye.",
+  "short_name": "Leave, Bye.",
+  "description": "A daily dose of funny, bullshit, deeply unhelpful quotes. Delivered at 8am, whether you like it or not.",
+  "start_url": "/?source=homescreen",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#222121",
+  "theme_color": "#222121",
+  "categories": ["lifestyle", "entertainment"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

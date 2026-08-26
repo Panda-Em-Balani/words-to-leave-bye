@@ -1,0 +1,19 @@
+{
+  "name": "words-to-leave-bye",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A daily dose of funny, bullshit, deeply unhelpful quotes. A leaving gift.",
+  "scripts": {
+    "dev": "node tools/dev-server.mjs",
+    "icons": "node tools/generate-icons.mjs",
+    "keys": "node tools/generate-vapid-keys.mjs",
+    "check": "node tools/check.mjs"
+  },
+  "dependencies": {
+    "web-push": "^3.6.7"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

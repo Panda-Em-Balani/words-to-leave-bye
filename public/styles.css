@@ -1,0 +1,519 @@
+/* =============================================================================
+   Words to "Leave, Bye."
+
+   Palette
+     #222121  ink      - the deepest background
+     #332f2f  slate    - raised surfaces, cards, sheets
+     #605553  ash      - muted text, hairlines
+     #073b62  marker   - the highlighter blue, used behind white text
+     #ffffff  paper    - the main type, which always looks highlighted
+   ============================================================================= */
+
+:root {
+  --ink: #222121;
+  --slate: #332f2f;
+  --ash: #605553;
+  --marker: #073b62;
+  --paper: #ffffff;
+
+  --marker-bright: #0a4d80;
+  --ash-soft: rgba(96, 85, 83, 0.42);
+  --paper-dim: rgba(255, 255, 255, 0.62);
+  --paper-faint: rgba(255, 255, 255, 0.34);
+
+  --font-ui: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-quote: ui-serif, "New York", Georgia, "Times New Roman", serif;
+
+  --gutter: clamp(22px, 6.5vw, 34px);
+  --radius: 20px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  background: var(--ink);
+}
+
+body {
+  font-family: var(--font-ui);
+  color: var(--paper);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+  background:
+    radial-gradient(120% 80% at 50% -10%, rgba(7, 59, 98, 0.5) 0%, transparent 62%),
+    radial-gradient(90% 60% at 100% 105%, rgba(51, 47, 47, 0.9) 0%, transparent 70%),
+    var(--ink);
+  background-attachment: fixed;
+}
+
+/* A whisper of paper grain so the dark never looks like flat plastic. */
+.grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
+}
+
+/* -----------------------------------------------------------------------------
+   Layout
+   ----------------------------------------------------------------------------- */
+
+.app {
+  position: relative;
+  z-index: 1;
+  min-height: 100svh;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: calc(var(--safe-top) + 26px) var(--gutter) calc(var(--safe-bottom) + 28px);
+  display: flex;
+  flex-direction: column;
+}
+
+.screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  animation: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.screen[hidden] { display: none; }
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* -----------------------------------------------------------------------------
+   The highlighter. White type on a marker swipe of #073b62.
+   The uneven radii are deliberate: a real highlighter never draws a rectangle.
+   ----------------------------------------------------------------------------- */
+
+.hl {
+  --swipe: 100%;
+  display: inline;
+  color: var(--paper);
+  padding: 0.06em 0.26em 0.12em;
+  margin: 0 -0.06em;
+  border-radius: 0.45em 0.85em 0.5em 0.7em / 0.7em 0.4em 0.8em 0.45em;
+  background-image: linear-gradient(101deg, var(--marker) 0%, var(--marker-bright) 55%, var(--marker) 100%);
+  background-repeat: no-repeat;
+  background-size: var(--swipe) 100%;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  box-shadow: 0 1px 0 rgba(7, 59, 98, 0.55);
+}
+
+/* The swipe draws itself on, left to right, like someone marking a page. */
+.hl-animate {
+  animation: swipe 0.72s cubic-bezier(0.33, 0.9, 0.35, 1) both;
+}
+
+@keyframes swipe {
+  from { --swipe: 0%; background-size: 0% 100%; }
+  to { --swipe: 100%; background-size: 100% 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .screen, .hl-animate { animation: none; }
+}
+
+/* -----------------------------------------------------------------------------
+   Brand
+   ----------------------------------------------------------------------------- */
+
+.brand { display: flex; flex-direction: column; gap: 6px; }
+.brand-sm { margin-bottom: 4px; }
+
+.brand-mark {
+  font-family: var(--font-quote);
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--paper);
+  background: var(--marker);
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  box-shadow: 0 10px 26px rgba(7, 59, 98, 0.45);
+}
+
+.brand-kicker {
+  margin: 14px 0 0;
+  font-size: 15px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--paper-faint);
+}
+
+.brand-title {
+  margin: 0;
+  font-family: var(--font-quote);
+  font-size: clamp(40px, 12vw, 58px);
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  font-weight: 700;
+}
+
+.headline {
+  margin: 0;
+  font-family: var(--font-quote);
+  font-size: clamp(30px, 8.4vw, 40px);
+  line-height: 1.22;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+}
+
+.lede {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.58;
+  color: var(--paper-dim);
+}
+
+.lede strong { color: var(--paper); font-weight: 600; }
+.lede em { color: var(--paper); font-style: italic; }
+
+.hint {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--paper-faint);
+  text-align: center;
+}
+
+.hint.is-warning { color: #e8b4a0; }
+.hint.is-good { color: #9fd0a8; }
+
+.footnote {
+  margin: auto 0 0;
+  padding-top: 26px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--paper-faint);
+  border-top: 1px solid var(--ash-soft);
+}
+
+/* -----------------------------------------------------------------------------
+   Controls
+   ----------------------------------------------------------------------------- */
+
+.stack { display: flex; flex-direction: column; gap: 12px; margin-top: auto; }
+
+.btn {
+  appearance: none;
+  border: 0;
+  width: 100%;
+  min-height: 56px;
+  padding: 17px 22px;
+  border-radius: 16px;
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--paper);
+  cursor: pointer;
+  transition: transform 0.14s ease, background-color 0.18s ease, opacity 0.18s ease;
+}
+
+.btn:active { transform: scale(0.977); }
+.btn:disabled { opacity: 0.4; cursor: default; }
+.btn:disabled:active { transform: none; }
+
+.btn:focus-visible {
+  outline: 2px solid var(--paper);
+  outline-offset: 3px;
+}
+
+.btn-primary {
+  background: var(--marker);
+  box-shadow: 0 12px 30px rgba(7, 59, 98, 0.42);
+}
+.btn-primary:hover { background: var(--marker-bright); }
+
+.btn-ghost {
+  background: var(--slate);
+  color: var(--paper);
+}
+.btn-ghost:hover { background: #3d3838; }
+
+.btn-quiet {
+  background: transparent;
+  color: var(--paper-faint);
+  min-height: 46px;
+  font-size: 15px;
+  font-weight: 500;
+}
+.btn-quiet:hover { color: var(--paper-dim); }
+
+/* Inside a sheet the panel is already --slate, so a ghost button on top of it
+   would be invisible. Lift it, and give it an edge to sit on. */
+.sheet-panel .btn-ghost {
+  background: #423d3d;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+.sheet-panel .btn-ghost:hover { background: #4b4545; }
+
+.icon-btn {
+  appearance: none;
+  border: 0;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--slate);
+  color: var(--paper-dim);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  flex: none;
+}
+.icon-btn:active { transform: scale(0.94); }
+.icon-btn svg { fill: currentColor; }
+
+.field { display: flex; flex-direction: column; gap: 9px; }
+
+.field-label {
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--paper-faint);
+}
+
+.input {
+  width: 100%;
+  min-height: 58px;
+  padding: 16px 18px;
+  border-radius: 16px;
+  border: 1px solid var(--ash-soft);
+  background: var(--slate);
+  color: var(--paper);
+  font-family: var(--font-quote);
+  font-size: 21px;
+  letter-spacing: -0.01em;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.input::placeholder { color: rgba(255, 255, 255, 0.26); font-family: var(--font-ui); font-size: 17px; }
+
+.input:focus {
+  outline: none;
+  border-color: var(--marker-bright);
+  box-shadow: 0 0 0 4px rgba(7, 59, 98, 0.4);
+}
+
+/* -----------------------------------------------------------------------------
+   Home screen
+   ----------------------------------------------------------------------------- */
+
+.screen-home { gap: 20px; }
+.screen-home .footnote { margin-top: 0; }
+
+.home-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.date-line {
+  margin: 4px 0 0;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--paper-faint);
+}
+
+.quote-card {
+  margin: 0;
+  padding: 30px 26px 26px;
+  border-radius: var(--radius);
+  background: linear-gradient(160deg, var(--slate) 0%, #2b2727 100%);
+  border: 1px solid var(--ash-soft);
+  box-shadow: 0 26px 60px rgba(0, 0, 0, 0.42);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  justify-content: center;
+  /* Grows into the space available, but capped: past this the quote just
+     floats alone in the middle of a very large empty box. */
+  flex: 1 1 auto;
+  min-height: 32svh;
+  max-height: 58svh;
+  overflow-y: auto;
+}
+
+.quote {
+  margin: 0;
+  font-family: var(--font-quote);
+  font-size: clamp(25px, 6.6vw, 33px);
+  line-height: 1.46;
+  letter-spacing: -0.015em;
+  font-weight: 500;
+}
+
+/* Long quotes step down a notch so they never need scrolling. */
+.quote.is-long { font-size: clamp(21px, 5.4vw, 27px); line-height: 1.5; }
+
+.quote-by {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--paper-faint);
+  font-style: italic;
+}
+.quote-by[hidden] { display: none; }
+
+/* -----------------------------------------------------------------------------
+   Sheets
+   ----------------------------------------------------------------------------- */
+
+.sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.sheet[hidden] { display: none; }
+
+.sheet-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 14, 14, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: fade 0.25s ease both;
+}
+
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+
+.sheet-panel {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  max-height: 92svh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 14px var(--gutter) calc(var(--safe-bottom) + 26px);
+  background: var(--slate);
+  border-radius: 26px 26px 0 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.55);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  animation: slide-up 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes slide-up { from { transform: translateY(100%); } to { transform: none; } }
+
+.sheet-grip {
+  width: 42px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--ash);
+  margin: 0 auto 4px;
+  flex: none;
+}
+
+.sheet-title {
+  margin: 0;
+  font-family: var(--font-quote);
+  font-size: 27px;
+  line-height: 1.24;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+}
+
+.sheet-note {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--paper-faint);
+}
+
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.steps li {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--paper-dim);
+}
+
+.steps strong { color: var(--paper); font-weight: 600; }
+
+.step-n {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--marker);
+  color: var(--paper);
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  font-weight: 700;
+  margin-top: 1px;
+}
+
+.ios-share {
+  width: 19px;
+  height: 19px;
+  fill: var(--paper);
+  vertical-align: -4px;
+  margin-left: 3px;
+}
+
+/* -----------------------------------------------------------------------------
+   Toast
+   ----------------------------------------------------------------------------- */
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--safe-bottom) + 26px);
+  transform: translateX(-50%);
+  z-index: 40;
+  max-width: min(440px, calc(100vw - 40px));
+  padding: 14px 20px;
+  border-radius: 14px;
+  background: var(--marker);
+  color: var(--paper);
+  font-size: 15px;
+  line-height: 1.45;
+  text-align: center;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+  animation: rise 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.toast[hidden] { display: none; }
+.toast.is-error { background: #6b2f2f; }
