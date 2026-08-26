@@ -64,8 +64,10 @@ function buildPayload(key, name, override) {
     ? { text: personalise(override.text, name), by: override.by }
     : quoteForDate(QUOTES, { key, stream: 'notification', name });
   return {
-    title: `Words to: "Leave, Bye."`,
-    body: `From your Bestfriend\n${quote.text}`,
+    // iOS prints the app's own name above this, so the title is the second
+    // line of the three and the quote is the third.
+    title: 'From your Bestfriend',
+    body: quote.text,
     by: quote.by,
     tag: `wtlb-${key}`,
     url: '/',

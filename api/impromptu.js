@@ -55,8 +55,8 @@ export default async function handler(req, res) {
     if (!subscribers.length) return json(res, 200, { ok: true, action, sent: 0, subscribers: 0 });
 
     const results = await sendToAll(subscribers, (record) => ({
-      title: `Words to: "Leave, Bye."`,
-      body: `From your Bestfriend\n${personalise(text, record.name)}`,
+      title: 'From your Bestfriend',
+      body: personalise(text, record.name),
       by,
       // A unique tag per send, so two impromptu quotes do not replace each
       // other on the lock screen the way the daily one deliberately does.
