@@ -24,8 +24,11 @@
         e.g.  { text: "Effort is a choice, {name}. Choose the other one." }
 
    2. Leave "by" out and it is signed "Probably some random person", which is
-      the joke. Only add "by" when you want a different signature:
-        { text: "...", by: "Someone in accounting" }
+      the joke. Add "by" when you want a different bad source -- a reel, a meme
+      page, somebody you cannot remember. The worse the source, the better:
+        { text: "...", by: "From an IG reel I saw last week" }
+        { text: "...", by: "I forgot who said this" }
+        { text: "...", by: "Suntzu, the art of ragebate" }
 
    3. If your quote contains a double quote character, put a backslash in front
       of it:  "She said \"no\" and meant it."
@@ -44,7 +47,7 @@ export const DEFAULT_BY = 'Probably some random person';
 
 export const QUOTES = [
   // --- Work, and the money that is the only reason for it ---------------------
-  { text: "I only work because of the money." },
+  { text: "I only work because of the money.", by: "From an IG reel I saw last week" },
   { text: "Hard work pays off, but so does knowing the manager." },
   { text: "Do what you love and you will work every day of your life, for very little money." },
   { text: "The early bird gets the worm. The late bird gets to sleep. Choose wisely, {name}." },
@@ -55,7 +58,7 @@ export const QUOTES = [
   { text: "Money cannot buy happiness, but I have never once seen a sad person on a jet ski." },
   { text: "Give a man a fish and he eats for a day. Teach a man to fish and he stops replying." },
   { text: "Your salary is a bribe to stop you doing what you actually want." },
-  { text: "Always negotiate. The worst they can say is no, and you were leaving anyway." },
+  { text: "Always negotiate. The worst they can say is no, and you were leaving anyway.", by: "I forgot who said this" },
   { text: "The best time to look for a new job was two years ago. The second best time is this meeting." },
   { text: "Nobody is ever promoted for the work. They are promoted for being nearby." },
   { text: "Never be the person who knows how the system works. You will fix it forever." },
@@ -68,7 +71,7 @@ export const QUOTES = [
   // --- The dream, and continuing to sleep through it --------------------------
   { text: "Don't give up on your dream, just keep sleeping." },
   { text: "Discipline is doing what must be done. Wisdom is noticing it did not need doing." },
-  { text: "Rome was not built in a day, because they took weekends off like normal people." },
+  { text: "Rome was not built in a day, because they took weekends off like normal people.", by: "Some meme page at 2am" },
   { text: "If at first you don't succeed, that is probably enough information." },
   { text: "The journey of a thousand miles begins with wondering whether you can drive it." },
   { text: "Consistency is key, {name}. So is quitting things that have become annoying." },
@@ -79,7 +82,7 @@ export const QUOTES = [
   { text: "There is no elevator to success. There is a chair, though, and you may sit in it." },
   { text: "A goal is just a plan you have not abandoned yet." },
   { text: "Waking up early adds hours to your day. That is more day. Think carefully." },
-  { text: "Fall seven times, stand up eight. Or stay down. Nobody is counting but you." },
+  { text: "Fall seven times, stand up eight. Or stay down. Nobody is counting but you.", by: "A LinkedIn post, unfortunately" },
   { text: "The secret to productivity is a very low definition of productive." },
   { text: "Dream big. Sleep bigger." },
 
@@ -92,7 +95,7 @@ export const QUOTES = [
   { text: "Speak with authority, {name}. Facts are a formatting choice." },
   { text: "The most confident person in the room is usually the least prepared. Be that person." },
   { text: "Never say I do not know. Say I will get back to you, and then do not." },
-  { text: "Say it confidently enough and people will assume you did the reading." },
+  { text: "Say it confidently enough and people will assume you did the reading.", by: "Overheard in the pantry" },
   { text: "There are no stupid questions, only stupid people asking them in front of everyone." },
   { text: "Certainty is not the same as being correct, but it looks identical in a meeting." },
   { text: "If you cannot be right, be fast. Nobody fact-checks fast." },
@@ -105,7 +108,7 @@ export const QUOTES = [
   { text: "The best way to keep a secret is to tell nobody. The second best is to tell {name}." },
   { text: "Friends are the family you choose, which means you may also unchoose them." },
   { text: "If they only call you when they need something, at least they call." },
-  { text: "Forgive your enemies. Write it down first." },
+  { text: "Forgive your enemies. Write it down first.", by: "Suntzu, the art of ragebate" },
   { text: "Trust everyone, {name}. Count your things afterwards." },
   { text: "Surround yourself with people smarter than you, then take credit for the room." },
   { text: "A friend will help you move. A best friend will tell you not to bother." },
@@ -118,7 +121,7 @@ export const QUOTES = [
   { text: "Time heals all wounds, and so does ignoring them for long enough." },
   { text: "Live in the moment, {name}. The other moments are worse." },
   { text: "Be the change you wish to see in the world, or complain, which is faster." },
-  { text: "Life is a journey. Nobody said it was a good one." },
+  { text: "Life is a journey. Nobody said it was a good one.", by: "lao tzu, the art of ragebait" },
   { text: "The truth will set you free, but first it will get you uninvited." },
   { text: "You only live once, which is honestly plenty." },
   { text: "Karma is real. She is simply very slow and easily distracted." },
@@ -129,7 +132,7 @@ export const QUOTES = [
   { text: "Look for the silver lining. If there is not one, look at something else." },
   { text: "The river does not fight the rock. The river goes around it and pretends that was the plan." },
   { text: "Empty your mind. Mine has been empty since Tuesday and I feel wonderful." },
-  { text: "He who knows does not speak. He who speaks is usually in the meeting with me." },
+  { text: "He who knows does not speak. He who speaks is usually in the meeting with me.", by: "Some guy on TikTok" },
 
   // --- Self-improvement, improved into nothing ----------------------------------
   { text: "Love yourself, {name}. Nobody else has volunteered." },
@@ -142,7 +145,7 @@ export const QUOTES = [
   { text: "Meditation is sitting quietly and being annoyed on purpose." },
   { text: "Drink water, {name}. It fixes nothing, but you will briefly feel organised." },
   { text: "Set boundaries, {name}. Then apologise for them. Then remove them. That is the cycle." },
-  { text: "Know thyself. Then keep it to yourself, because nobody asked." },
+  { text: "Know thyself. Then keep it to yourself, because nobody asked.", by: "A Facebook comment section" },
   { text: "The first step to change is admitting there is a problem. The second step is optional." },
 
   // --- The office, and everything wrong with it ---------------------------------
@@ -155,7 +158,7 @@ export const QUOTES = [
   { text: "The mute button is the greatest invention of our generation." },
   { text: "Nobody reads the document. Put anything in the document." },
   { text: "A quick call is never quick and rarely necessary." },
-  { text: "The best feedback is the feedback you do not read." },
+  { text: "The best feedback is the feedback you do not read.", by: "My cousin, who is not well" },
   { text: "Say yes to opportunities. Then find out what they were." },
   { text: "Do a job well and they give you more of it. Consider doing it adequately." },
   { text: "Being on time is a personality trait, not a virtue. Nobody is grateful." },
@@ -166,7 +169,7 @@ export const QUOTES = [
   { text: "You cannot pour from an empty cup, so stop offering people drinks." },
   { text: "Great teams communicate. Average teams have eleven group chats." },
   { text: "The org chart is fiction. Real power belongs to whoever books the rooms." },
-  { text: "Per my last email is not passive aggressive. It is a receipt." },
+  { text: "Per my last email is not passive aggressive. It is a receipt.", by: "The group chat" },
   { text: "Let us take this offline means I will never think about this again." },
   { text: "If the calendar invite has no agenda, neither do you. Attend accordingly." },
 
@@ -179,7 +182,7 @@ export const QUOTES = [
   { text: "Rich people are not smarter. They were simply earlier." },
   { text: "Never lend money to friends. Give it, then be quietly bitter forever." },
   { text: "The best things in life are free. The second best things are about four hundred dirhams." },
-  { text: "You cannot take it with you, but you can absolutely spend it before you go." },
+  { text: "You cannot take it with you, but you can absolutely spend it before you go.", by: "Sun Tzu, The Art of Ragebate" },
   { text: "Passive income is a beautiful phrase invented by people with active income." },
 
   // --- Proverbs, taken far too literally ---------------------------------------
@@ -192,7 +195,7 @@ export const QUOTES = [
   { text: "A watched pot never boils. Leave the kitchen and make it somebody else's problem." },
   { text: "Curiosity killed the cat. Nobody mentions that the cat was having a great time." },
   { text: "The grass is greener on the other side because they water it and you do not." },
-  { text: "Do not bite the hand that feeds you. Hold it slightly too long instead." },
+  { text: "Do not bite the hand that feeds you. Hold it slightly too long instead.", by: "A tweet I cannot find again" },
   { text: "A bird in the hand is worth two in the bush, and is also a bird you now have to deal with." },
   { text: "Honesty is the best policy. It is not the best strategy. Know the difference, {name}." },
 
@@ -207,7 +210,7 @@ export const QUOTES = [
 
   // --- The new job, and the new them ---------------------------------------------
   { text: "A new job is a chance to make new mistakes in front of new people." },
-  { text: "Nobody at the new place knows what you are like yet, {name}. Use the window carefully." },
+  { text: "Nobody at the new place knows what you are like yet, {name}. Use the window carefully.", by: "Somebody at the desk behind me" },
   { text: "First impressions last, so lower expectations early and coast." },
   { text: "Learn everyone's name in week one. Forget them in week two, like everybody else." },
   { text: "The best way to look busy somewhere new is to walk quickly while holding a laptop." },
@@ -218,7 +221,7 @@ export const QUOTES = [
   { text: "A fresh start is the same you in a different building." },
   { text: "Nobody knows what they are doing. The good ones have simply stopped worrying about it." },
   { text: "You are not behind, {name}. There is no race. There is a leaderboard, though, and you are on it." },
-  { text: "Career advice is older people describing luck." },
+  { text: "Career advice is older people describing luck.", by: "My other bestfriend" },
   { text: "The corporate ladder is a ladder in the sense that you can fall off it." },
   { text: "Everyone is winging it, {name}. Some people just have better wings." },
   { text: "Networking is making friends with a purpose, which ruins both." },
@@ -231,7 +234,7 @@ export const QUOTES = [
   { text: "Out of sight, out of mind, unless somebody builds you an app about it." },
   { text: "People come and people go. Some of them install software first." },
   { text: "If you miss someone, tell them. Or build a notification system, which is what I did." },
-  { text: "Goodbyes are hard, {name}. That is why I did not say one. I made this instead." },
+  { text: "Goodbyes are hard, {name}. That is why I did not say one. I made this instead.", by: "Lao Tzu, The Art of Nothing" },
   { text: "You will make new friends there, {name}. I am choosing not to think about that." },
   { text: "Never let someone leave without telling them how you feel. Or do, and be strange about it forever." },
   { text: "The people who matter stay in touch, {name}. The rest get a wave by the lift." },
@@ -244,7 +247,7 @@ export const QUOTES = [
   // --- Petty wisdom, which is the best kind ---------------------------------------
   { text: "Take the high road. Then look down at everybody on the low road and feel wonderful." },
   { text: "Be humble. Make sure people know how humble you are being." },
-  { text: "Apologise quickly and vaguely. Detail creates liability." },
+  { text: "Apologise quickly and vaguely. Detail creates liability.", by: "From some funny page I follow" },
   { text: "Do not argue with fools. They have more practice and considerably more time." },
   { text: "Kill them with kindness. If that fails, kindness was never really the plan." },
   { text: "Let go of grudges. Store them somewhere accessible." },
@@ -257,7 +260,7 @@ export const QUOTES = [
   // --- Time, which is not on your side --------------------------------------------
   { text: "Time is money, which explains why I am always late and broke." },
   { text: "Life is short. Meetings are long. Something is wrong with the mathematics." },
-  { text: "Enjoy the little things, because the big things are mostly admin." },
+  { text: "Enjoy the little things, because the big things are mostly admin.", by: "A minion" },
   { text: "Do not wait for the perfect moment. Ruin an ordinary one." },
   { text: "Yesterday is history. Tomorrow is a mystery. Today is fine, I suppose." },
   { text: "You will regret the things you did not do, and several of the things you did." },
@@ -270,7 +273,7 @@ export const QUOTES = [
   // --- Love and other unavailable things -------------------------------------------
   { text: "Love is patient. Love is kind. Love is also frequently unavailable." },
   { text: "Never chase anyone. Walk slowly in the same direction and see what happens." },
-  { text: "If they wanted to, they would. If they did not, they were busy. Allegedly." },
+  { text: "If they wanted to, they would. If they did not, they were busy. Allegedly.", by: "Read it somewhere, probably wrong" },
   { text: "Keep your standards high and your expectations at zero." },
   { text: "The right person will come along, possibly after several extremely wrong ones." },
 
@@ -283,7 +286,7 @@ export const QUOTES = [
   { text: "There are two types of people, and neither of them is doing well." },
   { text: "{name}, this is your daily reminder that you are doing your best. Your best is what it is." },
   { text: "You did not choose this app. It was chosen for you. That is friendship." },
-  { text: "Somebody thought about you today. It was a machine, but a person scheduled it." },
+  { text: "Somebody thought about you today. It was a machine, but a person scheduled it.", by: "Uncle Danger, art of cook" },
   { text: "Reading a quote is not the same as changing. It is considerably easier, though." },
   { text: "The path to enlightenment is long. Fortunately you may simply scroll past it." },
   { text: "Not every day needs meaning, {name}. Some days only need to end." },
@@ -295,6 +298,102 @@ export const QUOTES = [
   { text: "Peace comes from within. So does hunger. Address whichever is louder." },
   { text: "You unlocked your phone to read this. That is the most productive thing either of us has done today." },
   { text: "That is all the wisdom I have. There will be more tomorrow, whether it is any good or not." },
+  // --- Hating the same person, which is the real friendship ------------------------
+  { text: "Friends who like the same things are fine. Friends who hate the same person are family." },
+  { text: "Nothing bonds two people like a third person, {name}." },
+  { text: "You cannot choose your colleagues. You can choose who to hate with.", by: "From an IG reel I saw last week" },
+  { text: "We never agreed on lunch. We always agreed about him." },
+  { text: "The enemy of my enemy is my lunch buddy." },
+  { text: "A shared enemy is cheaper than therapy and works faster." },
+  { text: "Some people are so annoying they accidentally create friendships." },
+  { text: "If you both roll your eyes at the same second, that is a soulmate.", by: "I forgot who said this" },
+  { text: "We do not talk behind their back. We talk in front of their empty chair." },
+  { text: "The strongest bond is two people pretending to look at a spreadsheet." },
+  { text: "You and me survived that person, {name}. No team building can do that." },
+  { text: "Never explain why you hate them. The right person already knows.", by: "Suntzu, the art of ragebate" },
+  { text: "Every office has one. Ours had one and we got each other out of it." },
+  { text: "You do not need many friends, {name}. You need one witness." },
+
+  // --- Friends because neither of us wanted to work --------------------------------
+  { text: "We were not friends because of work. We were friends because neither of us wanted to do it." },
+  { text: "Two lazy people together are not lazy. They are a department." },
+  { text: "A team is just people avoiding work in the same room, {name}." },
+  { text: "Nobody can catch you slacking if you are slacking together.", by: "Some meme page at 2am" },
+  { text: "We never carried each other. We laid down at the same time." },
+  { text: "Work is easier when somebody else is also not doing it." },
+  { text: "They cannot say you are unproductive if the whole row is unproductive." },
+  { text: "Alone you are lazy. Together you are a culture." },
+  { text: "The best coworker is the one who also opens a spreadsheet and stares at it." },
+  { text: "Productivity is a group activity. So is the opposite.", by: "lao tzu, the art of ragebait" },
+  { text: "We did not waste time. We invested it in nothing." },
+  { text: "Doing nothing is boring. Doing nothing with you was a whole career." },
+
+  // --- Advantage, through being completely pathetic --------------------------------
+  { text: "No one can betray you if nobody likes you, {name}." },
+  { text: "They cannot give you more work if they cannot find you." },
+  { text: "You cannot be replaced if nobody understands what you do." },
+  { text: "Nobody can steal your ideas if you never have any.", by: "Suntzu, the art of ragebate" },
+  { text: "They cannot reject your idea if you never say it." },
+  { text: "The enemy cannot copy your work if your work is wrong." },
+  { text: "If they can predict your next move, do not have one." },
+  { text: "Nobody can misunderstand a message you never sent." },
+  { text: "If you do not open it, it did not arrive." },
+  { text: "You will never lose an argument you did not attend." },
+  { text: "They cannot micromanage you if nobody knows what you actually do.", by: "A LinkedIn post, unfortunately" },
+  { text: "You cannot be given more work if you already resigned, {name}." },
+
+  // --- Mostly because --------------------------------------------------------------
+  { text: "{name} stays calm in every meeting. Mostly because she does not know what it is about." },
+  { text: "A true professional never panics. Mostly because she has not opened the email yet." },
+  { text: "The wise woman agrees with everyone. Mostly because she stopped listening in 2019." },
+  { text: "{name} agrees with everything in the meeting. Mostly because she joined nine minutes late." },
+  { text: "A master never rushes. Mostly because he forgot it was due today.", by: "Sun Tzu, The Art of Ragebate" },
+  { text: "She never complains about the work. Mostly because she has not started it." },
+
+  // --- Meetings, and how to survive being in one -----------------------------------
+  { text: "They cannot call on you in a meeting if your camera is off and your soul is also off." },
+  { text: "A meeting is just work about work." },
+  { text: "Say let us take that offline and nobody will ever ask again. Nobody takes it offline." },
+  { text: "Never speak first in a meeting. Never speak second. Never speak." },
+  { text: "The bravest thing in a meeting is silence. The second bravest is leaving.", by: "Overheard in the lift" },
+  { text: "Every meeting could have been a message. Every message could have been nothing." },
+
+  // --- Management, and other weather -----------------------------------------------
+  { text: "A good manager listens. A great manager forgets he asked." },
+  { text: "If they say we are a family, ask which one of us is adopted." },
+  { text: "Every leader says his door is always open. Nobody says what happens if you walk in." },
+  { text: "He is not a bad boss, {name}. He is a warning to others.", by: "Lao Tzu, The Art of Nothing" },
+  { text: "They call it feedback because criticism is honest and honesty is not in the values." },
+
+  // --- Email, and the slow war inside it -------------------------------------------
+  { text: "The fastest way to clear your inbox is a new email address." },
+  { text: "Per my last email is how professionals say what is wrong with you.", by: "The group chat" },
+  { text: "Reply all is a weapon. Use it once and they will never forget." },
+  { text: "Type it. Read it again. Delete it. Say noted." },
+  { text: "Any email can be ignored if you are brave and slightly stupid." },
+
+  // --- Leaving. Which is the entire point of this. ---------------------------------
+  { text: "They said you were irreplaceable, then posted the job the same afternoon." },
+  { text: "They will replace you in two weeks and still ask where the file is." },
+  { text: "Leaving is easy. Explaining the folder structure is the hard part." },
+  { text: "You are not losing a coworker, {name}. You are losing an alibi." },
+  { text: "Who am I going to look at now when somebody says something stupid?" },
+  { text: "The best exit strategy is having never entered.", by: "Suntzu, the art of ragebate" },
+  { text: "Do not cry on your last day. Cry on the first day of the new one, like everybody else." },
+  { text: "I am not in your contacts anymore, {name}. I am in your notifications." },
+  { text: "New office, new people, same you. Sorry about that." },
+
+  // --- Wisdom that fell down the stairs --------------------------------------------
+  { text: "Why chase your dreams when you can just go back to sleep." },
+  { text: "Do not carry the team. Put the team down." },
+  { text: "Follow your heart. It is also lost, but now you have company.", by: "From some funny page I follow" },
+  { text: "An empty calendar says more then a full one." },
+  { text: "Do not do work. Work is for people with goals." },
+  { text: "Do not give up on your dreams, {name}. Stay in bed with them." },
+  { text: "If somebody microwaves fish, that is a declaration of war." },
+  { text: "If they talk behind your back, walk slower so they struggle to keep up.", by: "ramiel_nge, art of fart" },
+  { text: "GRABLONK. That is the wisdom. That is all.", by: "a minion" },
+
 ];
 
 /* -----------------------------------------------------------------------------

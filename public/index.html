@@ -19,7 +19,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
 <link rel="stylesheet" href="/styles.css" />
 
-<meta property="og:title" content="Words to Leave, Bye." />
+<meta property="og:title" content="Words to: &quot;Leave, Bye.&quot;" />
 <meta property="og:description" content="A daily dose of funny, bullshit, deeply unhelpful quotes." />
 <meta property="og:type" content="website" />
 </head>
@@ -32,17 +32,26 @@
   <!-- ===================================================================
        SCREEN 0 - Landing. Shown in Safari, before it lives on the Home Screen.
        =================================================================== -->
-  <section class="screen" data-screen="install" hidden>
-    <header class="brand">
-      <img class="brand-mark" src="/icons/panda.svg" alt="" width="52" height="52">
-      <p class="brand-kicker">Words to</p>
-      <h1 class="brand-title"><span class="hl">Leave, Bye.</span></h1>
-    </header>
+  <section class="screen screen-landing" data-screen="install" hidden>
 
-    <p class="lede">
-      Here is my work-parting gift for you so I can make sure that you never
-      forget about me. I'm part of your life po whether you like it or not.
-    </p>
+    <div class="landing-body">
+      <img class="brand-mark brand-mark-lg" src="/icons/panda.svg" alt="" width="88" height="88">
+
+      <h1 class="wordmark">
+        <span class="wordmark-lead">Words to:</span>
+        <span class="wordmark-main"><span class="hl">&ldquo;Leave, Bye.&rdquo;</span></span>
+      </h1>
+
+      <p class="wordmark-aside">
+        (Words to live by. I used wordplay here, just in case you did not get
+        the joke.)
+      </p>
+
+      <p class="lede">
+        This is my parting gift, so that you can never forget about me. I am
+        part of your life po, whether you like it or not.
+      </p>
+    </div>
 
     <div class="stack">
       <button class="btn btn-primary" id="install-cta" type="button">
@@ -61,63 +70,66 @@
       <img class="brand-mark" src="/icons/panda.svg" alt="" width="52" height="52">
     </header>
 
-    <h1 class="headline">
-      Before anything else.<br />
-      <span class="hl">Let me into your notifications.</span>
-    </h1>
+    <div class="landing-body">
+      <h1 class="headline">
+        You actually did it.<br />
+        <span class="hl">Now let me in.</span>
+      </h1>
 
-    <p class="lede">
-      One message every morning. That is the whole app. No badges, no nonsense,
-      no <em>we miss you, come back</em>.
-    </p>
+      <p class="lede">
+        Say yes to the pop up. That is the only way I get to reach you in the
+        morning, and I promise not to be annoying about it.
+      </p>
+    </div>
 
     <div class="stack">
       <button class="btn btn-primary" id="allow-cta" type="button">
-        Allow notifications
+        Okay, fine
       </button>
       <button class="btn btn-ghost" id="skip-permission" type="button">
-        Not right now
+        Later
       </button>
       <p class="hint" id="permission-hint"></p>
     </div>
   </section>
 
   <!-- ===================================================================
-       SCREEN 2 - The welcome, and the name.
+       SCREEN 2 - The name.
        =================================================================== -->
   <section class="screen" data-screen="name" hidden>
     <header class="brand brand-sm">
       <img class="brand-mark" src="/icons/panda.svg" alt="" width="52" height="52">
     </header>
 
-    <h1 class="headline">
-      Right. <span class="hl">Who am I talking to?</span>
-    </h1>
+    <div class="landing-body">
+      <h1 class="headline">
+        So <span class="hl">what do I call you?</span>
+      </h1>
 
-    <p class="lede">
-      Whatever you type here goes inside the quotes. So choose carefully, or
-      don't.
-    </p>
+      <p class="lede">
+        Whatever you type here is what I will use. Choose properly.
+      </p>
 
-    <label class="field">
-      <span class="field-label">What should I call you?</span>
-      <input
-        id="name-input"
-        class="input"
-        type="text"
-        inputmode="text"
-        autocomplete="given-name"
-        autocapitalize="words"
-        enterkeyhint="done"
-        maxlength="40"
-        placeholder="The name only I would use"
-      />
-    </label>
-    <p class="hint">Use the stupid one. It will show up in the quotes.</p>
+      <label class="field">
+        <span class="field-label">Your name</span>
+        <input
+          id="name-input"
+          class="input"
+          type="text"
+          inputmode="text"
+          autocomplete="given-name"
+          autocapitalize="words"
+          enterkeyhint="done"
+          maxlength="40"
+          placeholder="The one only I use"
+        />
+      </label>
+      <p class="hint">The stupid one. Obviously.</p>
+    </div>
 
     <div class="stack">
       <button class="btn btn-primary" id="name-cta" type="button" disabled>
-        That is me
+        Done
       </button>
     </div>
   </section>
@@ -139,7 +151,7 @@
     </header>
 
     <figure class="quote-card">
-      <blockquote id="quote-text" class="quote"><span class="hl">Loading something unhelpful.</span></blockquote>
+      <blockquote id="quote-text" class="quote"><span class="hl">Hold on.</span></blockquote>
       <figcaption id="quote-by" class="quote-by" hidden></figcaption>
     </figure>
 
@@ -159,13 +171,14 @@
   <div class="sheet-scrim" data-close-sheet></div>
   <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
     <div class="sheet-grip" aria-hidden="true"></div>
-    <h2 class="sheet-title" id="sheet-title">Two taps and I live here</h2>
+    <h2 class="sheet-title" id="sheet-title">Okay, here is how</h2>
 
     <ol class="steps" id="ios-steps">
       <li>
         <span class="step-n">1</span>
         <span class="step-body">
-          Tap the <strong>Share</strong> button at the bottom of Safari.
+          Tap the <strong>Share</strong> button at the bottom. The little square
+          with the arrow going up.
           <svg class="ios-share" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M12 3l3.2 3.2-1.4 1.4L13 6.8V15h-2V6.8L9.2 7.6 7.8 6.2 12 3z" />
             <path d="M5 11h3v2H6.5v7h11v-7H16v-2h3v11H5V11z" />
@@ -174,7 +187,7 @@
       </li>
       <li>
         <span class="step-n">2</span>
-        <span class="step-body">Scroll down and tap <strong>Add to Home Screen</strong>.</span>
+        <span class="step-body">Scroll down until you see <strong>Add to Home Screen</strong>. Tap that.</span>
       </li>
       <li>
         <span class="step-n">3</span>
@@ -183,7 +196,13 @@
     </ol>
 
     <p class="sheet-note" id="sheet-note">
-      Notifications only work from the Home Screen version. Apple's rule, not mine.
+      Open me from the Home Screen from now on. In Safari the notifications
+      just will not work, and that one is Apple's fault, not mine.
+    </p>
+
+    <p class="sheet-note sheet-sign-off">
+      If you can't do this even after my instructions, just ask your bestie to
+      do it for you. Oh God!
     </p>
 
     <button class="btn btn-primary" data-close-sheet type="button">Got it</button>
@@ -197,17 +216,17 @@
   <div class="sheet-scrim" data-close-sheet></div>
   <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="settings-title">
     <div class="sheet-grip" aria-hidden="true"></div>
-    <h2 class="sheet-title" id="settings-title">Settings, allegedly</h2>
+    <h2 class="sheet-title" id="settings-title">Settings</h2>
 
     <label class="field">
-      <span class="field-label">What I call you</span>
+      <span class="field-label">Your name</span>
       <input id="settings-name" class="input" type="text" maxlength="40" autocapitalize="words" />
     </label>
 
     <div class="stack">
-      <button class="btn btn-primary" id="save-name" type="button">Save that</button>
-      <button class="btn btn-ghost" id="test-push" type="button">Send me one right now</button>
-      <button class="btn btn-ghost" id="widget-cta" type="button">Add the Home Screen widget</button>
+      <button class="btn btn-primary" id="save-name" type="button">Save</button>
+      <button class="btn btn-ghost" id="test-push" type="button">Send one now</button>
+      <button class="btn btn-ghost" id="widget-cta" type="button">Add the widget</button>
       <button class="btn btn-ghost" id="enable-push" type="button" hidden>Turn notifications on</button>
       <p class="hint" id="settings-hint"></p>
     </div>
@@ -226,41 +245,41 @@
   <div class="sheet-scrim" data-close-sheet></div>
   <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="widget-title">
     <div class="sheet-grip" aria-hidden="true"></div>
-    <h2 class="sheet-title" id="widget-title">A panda on your Home Screen</h2>
+    <h2 class="sheet-title" id="widget-title">Me, on your Home Screen</h2>
 
     <p class="sheet-note">
-      Apple only lets real App Store apps make widgets, so this one borrows a
-      free app called <strong>Scriptable</strong>. Annoying, but it is a one-time
-      thing and I have done the fiddly parts.
+      Apple will not let me make a widget on my own, so we are borrowing a free
+      app called <strong>Scriptable</strong>. It is a bit of a faff, but only
+      once, and I have already done the hard parts.
     </p>
 
     <ol class="steps" id="widget-steps">
       <li>
         <span class="step-n">1</span>
         <span class="step-body">
-          Install <strong>Scriptable</strong> from the App Store, if you have not.
+          Get <strong>Scriptable</strong> from the App Store if you do not have it.
           <a class="inline-link" id="scriptable-store" href="https://apps.apple.com/app/scriptable/id1405459188" target="_blank" rel="noopener">Open the App Store</a>
         </span>
       </li>
       <li>
         <span class="step-n">2</span>
         <span class="step-body">
-          Tap the button below. It copies the widget and opens Scriptable on a
-          blank script.
+          Tap the button below. It copies me and opens Scriptable on an empty
+          script.
         </span>
       </li>
       <li>
         <span class="step-n">3</span>
         <span class="step-body">
-          Press and hold in the empty script, tap <strong>Paste</strong>, then
-          <strong>Done</strong>. Name it <strong>Leave, Bye</strong>.
+          Press and hold on the empty script, tap <strong>Paste</strong>, then
+          <strong>Done</strong>. Call it <strong>Leave, Bye</strong>.
         </span>
       </li>
       <li>
         <span class="step-n">4</span>
         <span class="step-body">
-          Hold the Home Screen, tap <strong>+</strong>, pick Scriptable, add a
-          <strong>medium</strong> widget.
+          Hold down your Home Screen, tap the <strong>+</strong>, find
+          Scriptable, pick the <strong>medium</strong> one.
         </span>
       </li>
       <li>
@@ -274,7 +293,7 @@
 
     <div class="stack">
       <button class="btn btn-primary" id="copy-widget" type="button">
-        Copy the widget and open Scriptable
+        Copy me and open Scriptable
       </button>
       <p class="hint" id="widget-hint"></p>
       <button class="btn btn-ghost" data-close-sheet type="button">Close</button>

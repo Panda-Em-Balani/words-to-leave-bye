@@ -54,8 +54,8 @@ function buildPayload(key, name, pinned) {
     ? { text: personalise(pinned.text, name), by: pinned.by }
     : quoteForDate(QUOTES, { key, stream: 'notification', name });
   return {
-    title: 'From your Bestfriend',
-    body: quote.text,
+    title: `Words to: "Leave, Bye."`,
+    body: `From your Bestfriend\n${quote.text}`,
     by: quote.by,
     tag: `wtlb-${key}`,
     url: '/',

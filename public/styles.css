@@ -147,21 +147,63 @@ body {
   object-fit: contain;
 }
 
-.brand-kicker {
-  margin: 14px 0 0;
-  font-size: 15px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--paper-faint);
+.brand-mark-lg {
+  width: 88px;
+  height: 88px;
+  padding: 10px;
+  border-radius: 26px;
 }
 
-.brand-title {
+/* The landing content sits in the middle of the screen rather than stacking at
+   the top and leaving a hole above the button. */
+.landing-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-height: 0;
+}
+
+/* -----------------------------------------------------------------------------
+   The wordmark. One lockup: the small line and the big highlighted line are
+   set in the same face and optically aligned, so they read as a single title
+   rather than a label sitting above a heading.
+   ----------------------------------------------------------------------------- */
+
+.wordmark {
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
   font-family: var(--font-quote);
-  font-size: clamp(40px, 12vw, 58px);
-  line-height: 1.08;
-  letter-spacing: -0.025em;
   font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.02;
+}
+
+.wordmark-lead {
+  font-size: clamp(25px, 7.4vw, 34px);
+  color: var(--paper-dim);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  /* Nudged right so the quote mark below hangs into the margin and the two
+     lines share an optical left edge. */
+  padding-left: 0.06em;
+}
+
+.wordmark-main {
+  font-size: clamp(41px, 12.4vw, 60px);
+  /* The highlighter needs a little room above and below, or the swipe clips
+     against the line above it. */
+  padding: 2px 0 4px;
+}
+
+.wordmark-aside {
+  margin: -8px 0 0;
+  font-size: 14.5px;
+  line-height: 1.5;
+  font-style: italic;
+  color: var(--paper-faint);
+  max-width: 34ch;
 }
 
 .headline {
@@ -208,6 +250,17 @@ body {
    ----------------------------------------------------------------------------- */
 
 .stack { display: flex; flex-direction: column; gap: 12px; margin-top: auto; }
+
+/* The landing used to strand its button at the bottom of the phone with a hole
+   above it. Centring the whole group -- logo, title, message, button -- keeps
+   it as one object and puts the button within thumb reach. */
+.landing-body + .stack { margin-top: 30px; }
+
+.screen-landing,
+.screen:has(> .landing-body) {
+  gap: 18px;
+  justify-content: center;
+}
 
 .btn {
   appearance: none;
@@ -446,6 +499,11 @@ body {
   font-size: 14px;
   line-height: 1.55;
   color: var(--paper-faint);
+}
+
+.sheet-sign-off {
+  color: var(--paper-dim);
+  font-style: italic;
 }
 
 .steps {

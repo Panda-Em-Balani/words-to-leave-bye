@@ -292,7 +292,7 @@ window.addEventListener('beforeinstallprompt', (event) => {
 function wireInstallScreen() {
   if (env.isInAppBrowser) {
     $('#install-hint').textContent =
-      'Open this link in Safari first. This in-app browser cannot install apps.';
+      'Open this in Safari first. This browser cannot put me on your Home Screen.';
     $('#install-hint').classList.add('is-warning');
   }
 
@@ -301,12 +301,12 @@ function wireInstallScreen() {
       deferredInstallPrompt.prompt();
       const { outcome } = await deferredInstallPrompt.userChoice;
       deferredInstallPrompt = null;
-      if (outcome === 'accepted') toast('Installed. Open me from your Home Screen.');
+      if (outcome === 'accepted') toast('Done. Open me from your Home Screen now.');
       return;
     }
     if (!env.isIOS) {
       $('#sheet-note').textContent =
-        'On Android use the browser menu, then "Install app" or "Add to Home screen".';
+        'On Android open the browser menu, then Install app or Add to Home screen.';
     }
     openSheet('#install-sheet');
   });
@@ -319,7 +319,7 @@ function wirePermissionScreen() {
     hint.textContent = 'Asking...';
     try {
       await enablePush();
-      hint.textContent = 'Done. That is the hard part over.';
+      hint.textContent = 'Done. That was the hard part.';
       hint.classList.add('is-good');
       setTimeout(() => show('name'), 650);
     } catch (error) {
@@ -360,7 +360,6 @@ function wireNameScreen() {
     syncSubscription().catch(() => {});
     renderHome();
     show('home');
-    toast(`Noted. You are ${name} now, forever.`);
   });
 }
 
@@ -390,23 +389,23 @@ async function refreshSettingsStatus() {
   $('#test-push').hidden = !granted;
 
   if (!env.pushAvailableHere && env.isIOS) {
-    note.textContent = 'Notifications need the Home Screen version of this app.';
+    note.textContent = 'Open me from the Home Screen and this will work.';
     return;
   }
   if (!granted) {
     note.textContent =
       env.supportsPush && Notification.permission === 'denied'
-        ? 'Notifications are blocked in iPhone Settings. Settings > Notifications > Leave, Bye.'
+        ? 'You blocked them. Go to iPhone Settings > Notifications > Daily Motto and turn them back on.'
         : 'Notifications are off.';
     return;
   }
-  note.textContent = 'You are on the list.';
+  note.textContent = "You're on the list.";
 }
 
 function wireSettingsSheet() {
   $('#save-name').addEventListener('click', async () => {
     const name = $('#settings-name').value.trim().slice(0, 40);
-    if (!name) return toast('It needs to be something.', 'error');
+    if (!name) return toast('It has to be something.', 'error');
     state.name = name;
     localStorage.setItem(STORE.name, name);
     renderHome();
@@ -415,7 +414,7 @@ function wireSettingsSheet() {
     } catch {
       /* the local name still works; the server catches up next time */
     }
-    toast(`Fine. ${name} it is.`);
+    toast('Saved.');
     closeSheets();
   });
 
@@ -446,7 +445,7 @@ function wireSettingsSheet() {
         method: 'POST',
         body: JSON.stringify({ endpoint: subscription.endpoint, name: state.name }),
       });
-      hint.textContent = 'Sent. Check your lock screen.';
+      hint.textContent = 'Sent. Go look at your lock screen.';
       hint.classList.add('is-good');
     } catch (error) {
       hint.textContent = error.message;
@@ -512,7 +511,7 @@ function wireWidgetSheet() {
     try {
       const script = await loadWidgetScript();
       await copyToClipboard(script);
-      hint.textContent = 'Copied. Opening Scriptable, then press and hold and paste.';
+      hint.textContent = 'Copied. Opening Scriptable now. Press and hold, then paste.';
       hint.classList.add('is-good');
       // Opens Scriptable on a fresh empty script. If it is not installed
       // nothing happens, which is why step 1 exists.
