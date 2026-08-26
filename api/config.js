@@ -1,6 +1,6 @@
 import { cors, json } from './_shared.js';
 import { vapidPublicKey, pushIsConfigured } from '../lib/push.js';
-import { isPersistent } from '../lib/store.js';
+import { isPersistent, storageDiagnostics } from '../lib/store.js';
 import { TIME_ZONE, SEND_HOUR } from '../public/daily.js';
 import { QUOTE_COUNT } from '../public/quotes.js';
 
@@ -15,5 +15,6 @@ export default async function handler(req, res) {
     timeZone: TIME_ZONE,
     sendHour: SEND_HOUR,
     quoteCount: QUOTE_COUNT,
+    storage: storageDiagnostics(),
   });
 }
