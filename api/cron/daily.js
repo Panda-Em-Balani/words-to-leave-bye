@@ -1,8 +1,8 @@
 import { cors, json, query, authorizeCron } from '../_shared.js';
-import { listSubscribers, claimSendSlot, lastSent } from '../../lib/store.js';
+import { listSubscribers, claimSendSlot, lastSent, getPinned, isPersistent } from '../../lib/store.js';
 import { sendToAll, pushIsConfigured } from '../../lib/push.js';
 import { QUOTES } from '../../public/quotes.js';
-import { quoteForDate, dateKey } from '../../public/daily.js';
+import { quoteForDate, dateKey, personalise } from '../../public/daily.js';
 
 /**
  * The 8am job.
@@ -29,15 +29,19 @@ export default async function handler(req, res) {
     return json(res, 200, { ok: true, skipped: 'already-sent', date: key, lastSent: await lastSent() });
   }
 
+  // A quote pinned for this morning replaces the deck's pick.
+  const pinned = isPersistent() ? await getPinned(key) : null;
+
   const subscribers = await listSubscribers();
   const results = await sendToAll(subscribers, (record) =>
-    buildPayload(key, record.name)
+    buildPayload(key, record.name, pinned)
   );
 
   const sent = results.filter((r) => r.ok).length;
   json(res, 200, {
     ok: true,
     date: key,
+    pinned: Boolean(pinned),
     subscribers: subscribers.length,
     sent,
     failed: results.length - sent,
@@ -45,8 +49,10 @@ export default async function handler(req, res) {
   });
 }
 
-function buildPayload(key, name) {
-  const quote = quoteForDate(QUOTES, { key, stream: 'notification', name });
+function buildPayload(key, name, pinned) {
+  const quote = pinned
+    ? { text: personalise(pinned.text, name), by: pinned.by }
+    : quoteForDate(QUOTES, { key, stream: 'notification', name });
   return {
     title: 'From your Bestfriend',
     body: quote.text,

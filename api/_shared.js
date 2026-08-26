@@ -1,3 +1,5 @@
+import { timingSafeEqual } from 'node:crypto';
+
 /* Small helpers shared by the API routes. Files prefixed with _ are not routes. */
 
 export function cors(res) {
@@ -66,4 +68,48 @@ export function authorizeCron(req) {
   if (!secret && req.headers['x-vercel-signature']) return true;
   if (!secret && process.env.VERCEL !== '1') return true;
   return false;
+}
+
+/**
+ * Quote text is rendered with textContent everywhere and goes out as a plain
+ * notification body, so punctuation is safe to keep. Only control characters
+ * need removing, plus a ceiling so nothing absurd reaches a lock screen.
+ */
+export function cleanQuote(value) {
+  let out = '';
+  for (const ch of String(value || '')) {
+    const code = ch.codePointAt(0);
+    // Line breaks become spaces rather than vanishing mid-sentence; every
+    // other control character is dropped.
+    if (code < 32 || code === 127) {
+      if (code === 9 || code === 10 || code === 13) out += ' ';
+      continue;
+    }
+    out += ch;
+  }
+  return out.replace(/\s+/g, ' ').trim().slice(0, 280);
+}
+
+function sameSecret(a, b) {
+  const left = Buffer.from(String(a), 'utf8');
+  const right = Buffer.from(String(b), 'utf8');
+  // timingSafeEqual throws when the lengths differ, so compare them here and
+  // let the constant-time check handle equal-length values.
+  if (left.length !== right.length) return false;
+  return timingSafeEqual(left, right);
+}
+
+/**
+ * Guards the owner-only routes. Fails closed: with no ADMIN_KEY set, a
+ * deployed app refuses every request rather than leaving the console open to
+ * anyone who guesses the URL. Local `npm run dev` stays unlocked.
+ */
+export function authorizeAdmin(req) {
+  const secret = process.env.ADMIN_KEY;
+  if (!secret) return process.env.VERCEL !== '1';
+
+  const header = req.headers.authorization || '';
+  const bearer = header.startsWith('Bearer ') ? header.slice(7) : '';
+  const supplied = bearer || req.headers['x-admin-key'] || '';
+  return Boolean(supplied) && sameSecret(supplied, secret);
 }

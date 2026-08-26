@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Console - Words to: "Leave, Bye."</title>
+<meta name="theme-color" content="#222121" />
+<!-- Owner-only page. Keep it out of search results and off the Home Screen. -->
+<meta name="robots" content="noindex, nofollow" />
+<link rel="stylesheet" href="/styles.css" />
+<style>
+  /* The console borrows the app's palette but is a plain scrolling page:
+     it is a tool for one person, not part of the gift. */
+  .console {
+    max-width: 620px;
+    margin: 0 auto;
+    padding: calc(var(--safe-top) + 26px) var(--gutter) calc(var(--safe-bottom) + 60px);
+  }
+
+  .console h1 {
+    font-family: var(--font-quote);
+    font-size: 27px;
+    margin: 0 0 4px;
+  }
+
+  .console .sub { color: var(--paper-dim); font-size: 14px; margin: 0 0 26px; }
+
+  .card {
+    background: var(--slate);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-bottom: 16px;
+  }
+
+  .card h2 {
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--paper-faint);
+    margin: 0 0 12px;
+    font-weight: 600;
+  }
+
+  label { display: block; font-size: 13px; color: var(--paper-dim); margin: 0 0 6px; }
+
+  input, textarea, select {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.28);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 13px;
+    color: var(--paper);
+    font: inherit;
+    font-size: 16px; /* 16px or iOS zooms the page on focus */
+    padding: 12px 13px;
+    margin-bottom: 14px;
+  }
+
+  textarea { min-height: 110px; resize: vertical; font-family: var(--font-quote); font-size: 17px; }
+  input:focus, textarea:focus, select:focus { outline: 2px solid var(--marker-bright); outline-offset: 1px; }
+
+  .row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .row > * { flex: 1 1 150px; }
+
+  button {
+    width: 100%;
+    font: inherit;
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--paper);
+    background: #423d3d;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 14px;
+    cursor: pointer;
+  }
+
+  button.primary { background: var(--marker); border-color: transparent; }
+  button.danger { background: transparent; color: var(--paper-dim); }
+  button:disabled { opacity: 0.45; cursor: default; }
+  button + button { margin-top: 10px; }
+
+  .preview {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 14px;
+    min-height: 74px;
+  }
+
+  .preview p { font-family: var(--font-quote); font-size: 19px; line-height: 1.45; margin: 0; }
+  .preview .hl { padding: 1px 5px; }
+  .preview cite { display: block; margin-top: 10px; font-size: 13px; color: var(--paper-dim); }
+
+  .meta { font-size: 13px; color: var(--paper-dim); line-height: 1.6; }
+  .meta strong { color: var(--paper); font-weight: 600; }
+  .count { font-size: 12px; color: var(--paper-faint); margin: -8px 0 14px; }
+  .count.over { color: #e2a03f; }
+
+  .msg { font-size: 14px; line-height: 1.5; margin: 12px 0 0; min-height: 20px; }
+  .msg.good { color: #7fc99a; }
+  .msg.bad { color: #e2726e; }
+
+  .pin { border-left: 2px solid var(--marker-bright); padding-left: 12px; margin: 12px 0; }
+  .pin p { margin: 0 0 4px; font-family: var(--font-quote); font-size: 16px; }
+  .pin span { font-size: 12px; color: var(--paper-faint); }
+
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+
+<main class="console">
+
+  <h1>Console</h1>
+  <p class="sub">Write something off-schedule. Only you can see this page.</p>
+
+  <!-- Unlock ------------------------------------------------------------- -->
+  <section class="card" id="lock-card">
+    <h2>Key</h2>
+    <label for="key">The ADMIN_KEY from your Vercel settings</label>
+    <input id="key" type="password" autocomplete="off" autocapitalize="off"
+           spellcheck="false" placeholder="paste it here" />
+    <button class="primary" id="unlock" type="button">Unlock</button>
+    <p class="msg" id="lock-msg"></p>
+  </section>
+
+  <!-- Compose ------------------------------------------------------------ -->
+  <div id="work" hidden>
+
+    <section class="card">
+      <h2>The quote</h2>
+
+      <label for="text">Write it. Type {name} anywhere and it becomes her name.</label>
+      <textarea id="text" placeholder="Effort is a choice, {name}. Choose the other one."></textarea>
+      <p class="count" id="count">0 characters</p>
+
+      <label for="by">Signed (leave blank for the usual)</label>
+      <input id="by" type="text" placeholder="Probably some random person" maxlength="40" />
+
+      <h2>How it will look</h2>
+      <div class="preview">
+        <p><span class="hl" id="preview-text">Nothing yet.</span></p>
+        <cite id="preview-by"></cite>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>What to do with it</h2>
+
+      <button class="primary" id="send-now" type="button">Send it to her now</button>
+      <button id="pin-today" type="button">Make it today's quote</button>
+      <button id="pin-tomorrow" type="button">Make it tomorrow's 8am quote</button>
+
+      <p class="msg" id="msg"></p>
+    </section>
+
+    <!-- Standing state ---------------------------------------------------- -->
+    <section class="card">
+      <h2>Right now</h2>
+      <p class="meta" id="status">Loading...</p>
+
+      <div id="pins"></div>
+
+      <button class="danger" id="clear-today" type="button" hidden>Unpin today</button>
+      <button class="danger" id="clear-tomorrow" type="button" hidden>Unpin tomorrow</button>
+      <button class="danger" id="refresh" type="button">Refresh</button>
+    </section>
+
+    <p class="meta">
+      A pinned quote replaces the deck everywhere for that day - the app, the
+      widget and that morning's push. Sending does not pin: it just arrives.
+    </p>
+  </div>
+
+</main>
+
+<script src="/console.js" type="module"></script>
+</body>
+</html>

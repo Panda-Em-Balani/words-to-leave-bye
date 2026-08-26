@@ -82,7 +82,7 @@ app to Apple's push servers.
 
 ### 4. Set the environment variables
 
-Vercel project -> **Settings -> Environment Variables**. Add four:
+Vercel project -> **Settings -> Environment Variables**. Add five:
 
 | Name | Value |
 |---|---|
@@ -90,6 +90,7 @@ Vercel project -> **Settings -> Environment Variables**. Add four:
 | `VAPID_PRIVATE_KEY` | from step 3 |
 | `VAPID_SUBJECT` | `mailto:your@email.com` |
 | `CRON_SECRET` | any long random string you invent |
+| `ADMIN_KEY` | another long random string, for your console |
 
 Then **redeploy** so they take effect. Environment variables do not apply to an
 existing deployment.
@@ -168,9 +169,9 @@ with total confidence. The funniest ones sound like real advice right up until
 the last four words.
 
 - `{name}` is replaced with whatever she typed on the welcome screen
-- Leave `by` out and it is signed *Lao Tzu, The Art of Ragebait* — that is the
+- Leave `by` out and it is signed *Probably some random person* — that is the
   joke, and it is the default for every quote
-- Add `by: "Sun Tzu, The Art of Ragebait"` only when you want a different signature
+- Add `by: "Someone in accounting"` only when you want a different signature
 - Order does not matter — the app shuffles
 - Commit, push, and Vercel redeploys itself
 
@@ -180,6 +181,37 @@ lock screen, duplicated, or has a typo in a placeholder.
 The 221 quotes in there now are a starting point. **Replace the ones that do not
 sound like you.** The app is only as funny as the quotes, and the ones that will
 land hardest are the ones only the two of you understand.
+
+---
+
+## Sending a quote that is not in the book
+
+Adding to `public/quotes.js` needs a commit and a redeploy, which is fine for
+the book but useless when you think of something at 11pm. So there is a
+private page for that:
+
+```
+https://words-to-leave-bye.vercel.app/console.html
+```
+
+Open it, paste your `ADMIN_KEY`, and it stays unlocked on that browser. It is
+not linked from anywhere in the app and it is marked `noindex`. **Without
+`ADMIN_KEY` set, the console refuses everything** — it never falls open.
+
+Type a quote (`{name}` still works) and pick one of three:
+
+| Button | What happens |
+|---|---|
+| **Send it to her now** | Pushes it to her phone immediately, off schedule. Does not change what the app or widget show. |
+| **Make it today's quote** | Pins it. The app, the widget and today's quote all become this. |
+| **Make it tomorrow's 8am quote** | Pins it for tomorrow, so the 8am job sends this instead of the deck's pick. |
+
+A pinned quote wins over the shuffled deck for that whole day, on every
+surface. Unpin it and the deck comes straight back — nothing is consumed and
+the rotation is not disturbed. Pins expire on their own after ten days.
+
+Pinning needs the database (step 2); sending needs the notification keys
+(step 3). The console tells you if either is missing.
 
 ---
 
@@ -267,9 +299,11 @@ public/
   app.js                 screens, onboarding, push, widget handoff
   sw.js                  service worker: receives the push, works offline
   leave-bye-widget.js    the Scriptable widget, served so the app can copy it
+  console.html/.js       your private page for off-schedule quotes
   icons/panda.svg        the logo. Replace it and run `npm run icons`.
 api/                     serverless endpoints
   cron/daily.js          the 8am job
+  impromptu.js           send-now and pin-a-quote, behind ADMIN_KEY
 lib/                     storage and push delivery
 tools/                   key generation, icons, local server, readiness check
 ```

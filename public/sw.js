@@ -48,6 +48,10 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
+  // The owner console is a tool, not part of the app. It stays off the cache
+  // so it is never served stale and never sits in storage on her phone.
+  if (url.pathname.startsWith('/console')) return;
+
   // The API is never worth serving stale.
   if (url.pathname.startsWith('/api/')) {
     event.respondWith(fetch(request).catch(() => new Response('{}', {

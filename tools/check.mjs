@@ -78,6 +78,11 @@ const hasStore = Boolean(
 );
 check('Subscriber storage configured', hasStore, hasStore ? 'Redis reachable via REST' : 'add the Upstash integration in Vercel');
 check('CRON_SECRET set', Boolean(process.env.CRON_SECRET), process.env.CRON_SECRET ? 'present' : 'any long random string');
+check(
+  'ADMIN_KEY set',
+  Boolean(process.env.ADMIN_KEY),
+  process.env.ADMIN_KEY ? 'present' : 'unlocks /console.html; without it the console is shut'
+);
 
 // The app substitutes this placeholder for the live address when it hands the
 // script to Scriptable, so the placeholder needs to still be there.

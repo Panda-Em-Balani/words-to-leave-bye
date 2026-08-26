@@ -26,6 +26,8 @@ const state = {
   config: null,
   registration: null,
   subscription: null,
+  pinned: null,
+  showingDaily: true,
 };
 
 /* -----------------------------------------------------------------------------
@@ -126,11 +128,37 @@ function paintQuote(text, by) {
 }
 
 function todaysQuote() {
+  // A quote pinned for today, written by hand, beats the deck. The deck is
+  // still what shows first and what shows offline.
+  const pinned = state.pinned;
+  if (pinned && pinned.date === dateKey()) {
+    return { text: personalise(pinned.text, state.name), by: pinned.by };
+  }
   return quoteForDate(QUOTES, { stream: 'widget', name: state.name });
+}
+
+/**
+ * Asks the server whether today has a pinned quote. Never blocks the first
+ * paint and never breaks anything when offline: the deck quote is already on
+ * screen, and this only repaints if there is something different to show.
+ */
+async function refreshPinned() {
+  try {
+    const today = await api(
+      `/api/today?stream=widget&name=${encodeURIComponent(state.name || '')}`
+    );
+    if (!today || today.date !== dateKey()) return;
+    state.pinned = today.pinned ? { date: today.date, text: today.text, by: today.by } : null;
+    // Leave a quote she pulled up with the button alone.
+    if (state.showingDaily) renderHome();
+  } catch {
+    /* offline, or the API is not up. The deck quote stands. */
+  }
 }
 
 function renderHome() {
   const quote = todaysQuote();
+  state.showingDaily = true;
   paintQuote(quote.text, quote.by);
 
   const hour = Number(
@@ -343,6 +371,7 @@ function wireHomeScreen() {
     do {
       pick = QUOTES[Math.floor(Math.random() * QUOTES.length)];
     } while (QUOTES.length > 1 && personalise(pick.text, state.name) === today.text);
+    state.showingDaily = false;
     paintQuote(personalise(pick.text, state.name), pick.by || DEFAULT_BY);
   });
 
@@ -521,6 +550,7 @@ async function boot() {
 
   registerServiceWorker();
   loadConfig();
+  refreshPinned();
 
   // Coming back to the app on a new day should show the new quote.
   let shownFor = dateKey();
@@ -528,8 +558,10 @@ async function boot() {
     if (document.visibilityState !== 'visible') return;
     if (dateKey() !== shownFor) {
       shownFor = dateKey();
+      state.pinned = null;
       renderHome();
     }
+    refreshPinned();
   });
 }
 
