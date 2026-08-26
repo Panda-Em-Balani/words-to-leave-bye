@@ -18,7 +18,7 @@ if (existsSync(envFile)) {
   }
 }
 
-const { QUOTES } = await import('../public/quotes.js');
+const { QUOTES, DEFAULT_BY } = await import('../public/quotes.js');
 const { quoteForDate, dateKey, indexForDate } = await import('../public/daily.js');
 
 const results = [];
@@ -79,12 +79,19 @@ const hasStore = Boolean(
 check('Subscriber storage configured', hasStore, hasStore ? 'Redis reachable via REST' : 'add the Upstash integration in Vercel');
 check('CRON_SECRET set', Boolean(process.env.CRON_SECRET), process.env.CRON_SECRET ? 'present' : 'any long random string');
 
-const widgetFile = readFileSync(join(ROOT, 'widget', 'leave-bye-widget.js'), 'utf8');
+// The app substitutes this placeholder for the live address when it hands the
+// script to Scriptable, so the placeholder needs to still be there.
+const widgetFile = readFileSync(join(ROOT, 'public', 'leave-bye-widget.js'), 'utf8');
 check(
-  'Widget script points at your deployment',
-  !widgetFile.includes('REPLACE-ME'),
-  widgetFile.includes('REPLACE-ME') ? 'edit BASE_URL in widget/leave-bye-widget.js' : 'BASE_URL set'
+  'Widget script is substitutable',
+  widgetFile.includes('https://REPLACE-ME.vercel.app'),
+  widgetFile.includes('https://REPLACE-ME.vercel.app')
+    ? 'the app fills in the address when she copies it'
+    : 'BASE_URL placeholder was edited; the in-app copy button cannot fill it in'
 );
+
+const signed = QUOTES.filter((q) => q.by).length;
+check('Quotes are signed by Lao Tzu', true, `${QUOTES.length - signed} use the default signature`);
 
 /* --- report ---------------------------------------------------------------- */
 

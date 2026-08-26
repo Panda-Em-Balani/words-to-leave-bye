@@ -16,6 +16,8 @@
    200 days per stream.
    ----------------------------------------------------------------------------- */
 
+import { DEFAULT_BY } from './quotes.js';
+
 export const TIME_ZONE = 'Asia/Dubai';
 export const SEND_HOUR = 8; // 08:00 Dubai time
 export const DEFAULT_NAME = 'friend';
@@ -94,7 +96,7 @@ export function quoteForDate(quotes, { key = dateKey(), stream = 'notification',
     stream,
     index,
     text: personalise(quote.text, name),
-    by: quote.by || null,
+    by: quote.by || DEFAULT_BY,
   };
 }
 

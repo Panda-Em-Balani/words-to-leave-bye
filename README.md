@@ -3,7 +3,8 @@
 A daily dose of funny, bullshit, deeply unhelpful quotes, pushed to her iPhone
 at 8am Dubai time. Built as a leaving gift.
 
-- **200 quotes** in `public/quotes.js`, personalised with her name
+- **221 quotes** in `public/quotes.js`, written in the house style of
+  *The Art of Ragebait* and signed, always, by Lao Tzu
 - **8am notification** every day, Asia/Dubai, all year (the UAE has no DST)
 - **Home Screen widget** showing a *different* quote from the morning's one
 - Her flow: scan QR -> add to Home Screen -> allow notifications -> type her
@@ -23,7 +24,7 @@ Two consequences, honestly stated:
 |---|---|---|
 | Home Screen icon | Yes | She adds it herself, two taps, guided in-app |
 | 8am notification | Yes | Real Web Push, iOS 16.4+, once it is on her Home Screen |
-| Home Screen **widget** | **Not from the web app** | Apple only allows widgets from native apps. Free workaround included below (Scriptable) |
+| Home Screen **widget** | **Not from the web app** | Apple only allows widgets from native apps. Free workaround below, and the app does the fiddly parts for her |
 
 **The one hard limitation:** iOS will not send notifications to a web app opened
 in Safari. It has to be on the Home Screen first. The app detects this and walks
@@ -155,22 +156,28 @@ each day claims that day, and any repeat call returns `"skipped":
 
 ## Adding your own quotes
 
-This is the part that actually matters. Open **`public/quotes.js`** and add
-lines:
+Open **`public/quotes.js`** and add lines:
 
 ```js
-{ text: "You are not late, {name}, everyone else is simply early.", by: "Me, 2024" },
+{ text: "Effort is a choice, {name}. Choose the other one." },
 ```
 
+**The house style is The Art of Ragebait**: shape it like ancient wisdom, then
+collapse it into something petty, lazy, greedy or blandly literal. Deliver it
+with total confidence. The funniest ones sound like real advice right up until
+the last four words.
+
 - `{name}` is replaced with whatever she typed on the welcome screen
-- `by` is optional
+- Leave `by` out and it is signed *Lao Tzu, The Art of Ragebait* — that is the
+  joke, and it is the default for every quote
+- Add `by: "Sun Tzu, The Art of Ragebait"` only when you want a different signature
 - Order does not matter — the app shuffles
 - Commit, push, and Vercel redeploys itself
 
 Run `npm run check` afterwards. It will tell you if a quote is too long for a
 lock screen, duplicated, or has a typo in a placeholder.
 
-The 200 quotes in there now are a starting point. **Replace the ones that do not
+The 221 quotes in there now are a starting point. **Replace the ones that do not
 sound like you.** The app is only as funny as the quotes, and the ones that will
 land hardest are the ones only the two of you understand.
 
@@ -178,21 +185,23 @@ land hardest are the ones only the two of you understand.
 
 ## The Home Screen widget
 
-Apple does not allow web apps to provide widgets. The workaround, which is free
-and takes about three minutes:
+Apple does not allow web apps to provide widgets, so this borrows **Scriptable**,
+a free App Store app that can host them. **Yes, she has to install it** — there
+is no way around that on iOS.
 
-1. Edit `widget/leave-bye-widget.js` and set `BASE_URL` to your deployed URL
-2. She installs **Scriptable** from the App Store (free)
-3. She pastes the script in, names it "Leave, Bye"
-4. She long-presses the Home Screen -> **+** -> Scriptable -> medium widget
-5. Long-press the widget -> **Edit Widget** -> Script: *Leave, Bye*, Parameter:
-   *her name*
+What the app does automate: in the app, the **·** menu → **Add the Home Screen
+widget** copies the whole widget script to her clipboard *with your deployment's
+address already filled in*, then opens Scriptable on a blank script. She pastes,
+names it, and adds the widget.
 
-Full instructions are in the comment at the top of that file, written for her
-rather than for you.
+You do not need to edit anything. The address is substituted at copy time from
+wherever the app is being served.
+
+Scriptable's URL scheme can only open a *blank* new script — it accepts no
+source — so "paste" is the one step that cannot be removed. Five taps, once.
 
 The widget shows a **different quote from the morning notification**, which is
-what you asked for — two separate streams, each shuffled so all 200 are used
+what you asked for — two separate streams, each shuffled so all 221 are used
 before any repeats.
 
 ---
@@ -200,7 +209,7 @@ before any repeats.
 ## How the daily quote is chosen
 
 Both streams deal from a shuffled deck rather than picking at random, so she
-sees all 200 before she sees any of them twice — 200 days per stream. The deck
+sees all 221 before she sees any of them twice — 221 days per stream. The deck
 is derived from the date, so the app, the notification and the widget all agree
 on the answer without needing to talk to each other. That is also why the widget
 still shows the right quote with no signal.
@@ -231,6 +240,8 @@ to Vercel and test there. Everything else works fine on localhost.
 | It arrived at 08:40 | Free-plan cron. See [About the 8am timing](#about-the-8am-timing) |
 | Notifications stopped | If she deletes the Home Screen icon, the subscription dies. She has to add it and allow again |
 | Wrong name in quotes | · menu -> change it -> Save |
+| Widget stuck on an old quote | iOS decides when to refresh widgets. It catches up, usually within the hour |
+| Nothing happens on "open Scriptable" | Scriptable is not installed. Step 1 of that sheet links to it |
 
 ---
 
@@ -250,14 +261,15 @@ the better trade.
 ## Layout
 
 ```
-public/          the app she sees
-  quotes.js      <- the 200 quotes. This is the file you edit.
-  daily.js       which quote belongs to which day
-  app.js         screens, onboarding, push subscription
-  sw.js          service worker: receives the push, works offline
-api/             serverless endpoints
-  cron/daily.js  the 8am job
-lib/             storage and push delivery
-widget/          the Scriptable Home Screen widget
-tools/           key generation, icons, local server, readiness check
+public/
+  quotes.js              <- the 221 quotes. This is the file you edit.
+  daily.js               which quote belongs to which day
+  app.js                 screens, onboarding, push, widget handoff
+  sw.js                  service worker: receives the push, works offline
+  leave-bye-widget.js    the Scriptable widget, served so the app can copy it
+  icons/panda.svg        the logo. Replace it and run `npm run icons`.
+api/                     serverless endpoints
+  cron/daily.js          the 8am job
+lib/                     storage and push delivery
+tools/                   key generation, icons, local server, readiness check
 ```

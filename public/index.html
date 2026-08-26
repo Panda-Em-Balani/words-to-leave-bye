@@ -32,7 +32,7 @@
        =================================================================== -->
   <section class="screen" data-screen="install" hidden>
     <header class="brand">
-      <span class="brand-mark" aria-hidden="true">L,</span>
+      <img class="brand-mark" src="/icons/panda.svg" alt="" width="52" height="52">
       <p class="brand-kicker">Words to</p>
       <h1 class="brand-title"><span class="hl">Leave, Bye.</span></h1>
     </header>
@@ -60,7 +60,7 @@
        =================================================================== -->
   <section class="screen" data-screen="permission" hidden>
     <header class="brand brand-sm">
-      <span class="brand-mark" aria-hidden="true">L,</span>
+      <img class="brand-mark" src="/icons/panda.svg" alt="" width="52" height="52">
     </header>
 
     <h1 class="headline">
@@ -90,7 +90,7 @@
        =================================================================== -->
   <section class="screen" data-screen="name" hidden>
     <header class="brand brand-sm">
-      <span class="brand-mark" aria-hidden="true">L,</span>
+      <img class="brand-mark" src="/icons/panda.svg" alt="" width="52" height="52">
     </header>
 
     <h1 class="headline">
@@ -214,6 +214,7 @@
     <div class="stack">
       <button class="btn btn-primary" id="save-name" type="button">Save that</button>
       <button class="btn btn-ghost" id="test-push" type="button">Send me one right now</button>
+      <button class="btn btn-ghost" id="widget-cta" type="button">Add the Home Screen widget</button>
       <button class="btn btn-ghost" id="enable-push" type="button" hidden>Turn notifications on</button>
       <button class="btn btn-quiet" id="disable-push" type="button" hidden>Turn the 8am one off</button>
       <p class="hint" id="settings-hint"></p>
@@ -222,6 +223,70 @@
     <p class="sheet-note" id="status-note"></p>
 
     <button class="btn btn-ghost" data-close-sheet type="button">Close</button>
+  </div>
+</div>
+
+<!-- =====================================================================
+     Widget setup. Apple does not allow web apps to provide widgets, so this
+     hands the script to Scriptable with as little work for her as iOS permits.
+     ===================================================================== -->
+<div class="sheet" id="widget-sheet" hidden>
+  <div class="sheet-scrim" data-close-sheet></div>
+  <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="widget-title">
+    <div class="sheet-grip" aria-hidden="true"></div>
+    <h2 class="sheet-title" id="widget-title">A panda on your Home Screen</h2>
+
+    <p class="sheet-note">
+      Apple only lets real App Store apps make widgets, so this one borrows a
+      free app called <strong>Scriptable</strong>. Annoying, but it is a one-time
+      thing and I have done the fiddly parts.
+    </p>
+
+    <ol class="steps" id="widget-steps">
+      <li>
+        <span class="step-n">1</span>
+        <span class="step-body">
+          Install <strong>Scriptable</strong> from the App Store, if you have not.
+          <a class="inline-link" id="scriptable-store" href="https://apps.apple.com/app/scriptable/id1405459188" target="_blank" rel="noopener">Open the App Store</a>
+        </span>
+      </li>
+      <li>
+        <span class="step-n">2</span>
+        <span class="step-body">
+          Tap the button below. It copies the widget and opens Scriptable on a
+          blank script.
+        </span>
+      </li>
+      <li>
+        <span class="step-n">3</span>
+        <span class="step-body">
+          Press and hold in the empty script, tap <strong>Paste</strong>, then
+          <strong>Done</strong>. Name it <strong>Leave, Bye</strong>.
+        </span>
+      </li>
+      <li>
+        <span class="step-n">4</span>
+        <span class="step-body">
+          Hold the Home Screen, tap <strong>+</strong>, pick Scriptable, add a
+          <strong>medium</strong> widget.
+        </span>
+      </li>
+      <li>
+        <span class="step-n">5</span>
+        <span class="step-body">
+          Hold the new widget, tap <strong>Edit Widget</strong>, set Script to
+          <strong>Leave, Bye</strong> and Parameter to <strong id="widget-param-name">your name</strong>.
+        </span>
+      </li>
+    </ol>
+
+    <div class="stack">
+      <button class="btn btn-primary" id="copy-widget" type="button">
+        Copy the widget and open Scriptable
+      </button>
+      <p class="hint" id="widget-hint"></p>
+      <button class="btn btn-ghost" data-close-sheet type="button">Close</button>
+    </div>
   </div>
 </div>
 

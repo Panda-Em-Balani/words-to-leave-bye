@@ -135,20 +135,16 @@ body {
 .brand { display: flex; flex-direction: column; gap: 6px; }
 .brand-sm { margin-bottom: 4px; }
 
+/* The panda sits on the same warm off-white as the Home Screen icon, so the
+   app and the icon read as one object. */
 .brand-mark {
-  font-family: var(--font-quote);
-  font-size: 30px;
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.03em;
-  color: var(--paper);
-  background: var(--marker);
-  width: 52px;
-  height: 52px;
-  display: grid;
-  place-items: center;
-  border-radius: 16px;
-  box-shadow: 0 10px 26px rgba(7, 59, 98, 0.45);
+  width: 56px;
+  height: 56px;
+  padding: 7px;
+  background: #f7f4f2;
+  border-radius: 17px;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.38);
+  object-fit: contain;
 }
 
 .brand-kicker {
@@ -484,6 +480,15 @@ body {
   font-size: 14px;
   font-weight: 700;
   margin-top: 1px;
+}
+
+.inline-link {
+  display: inline-block;
+  margin-top: 6px;
+  color: var(--paper);
+  font-size: 15px;
+  text-decoration-color: var(--marker-bright);
+  text-underline-offset: 3px;
 }
 
 .ios-share {

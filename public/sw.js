@@ -17,6 +17,7 @@ const SHELL = [
   '/quotes.js',
   '/daily.js',
   '/manifest.webmanifest',
+  '/icons/panda.svg',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
   '/icons/icon-180.png',

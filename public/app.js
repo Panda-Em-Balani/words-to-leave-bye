@@ -118,7 +118,7 @@ function paintQuote(text, by) {
 
   const caption = $('#quote-by');
   if (by) {
-    caption.textContent = `- ${by}`;
+    caption.textContent = `\u2014 ${by}`;
     caption.hidden = false;
   } else {
     caption.hidden = true;
@@ -469,6 +469,77 @@ function wireSettingsSheet() {
   });
 }
 
+/* -----------------------------------------------------------------------------
+   The widget
+
+   iOS will not let a web app supply a Home Screen widget, and Scriptable's URL
+   scheme can only open a blank new script -- it cannot be handed source. So the
+   best available is: put the script on her clipboard with this deployment's
+   address already substituted in, open Scriptable, and let her paste.
+   ----------------------------------------------------------------------------- */
+
+const SCRIPTABLE_PLACEHOLDER = 'https://REPLACE-ME.vercel.app';
+let widgetScript = null;
+
+/** Fetched up front, so the copy itself stays inside the tap that asked for it.
+    Safari only allows clipboard writes from a user gesture. */
+async function loadWidgetScript() {
+  if (widgetScript) return widgetScript;
+  const res = await fetch('/leave-bye-widget.js');
+  if (!res.ok) throw new Error('Could not load the widget script.');
+  const source = await res.text();
+  widgetScript = source.replaceAll(SCRIPTABLE_PLACEHOLDER, window.location.origin);
+  return widgetScript;
+}
+
+async function copyToClipboard(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+  // Older iOS in a web app context: fall back to a hidden selection.
+  const field = document.createElement('textarea');
+  field.value = text;
+  field.setAttribute('readonly', '');
+  field.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+  document.body.appendChild(field);
+  field.select();
+  field.setSelectionRange(0, text.length);
+  const ok = document.execCommand('copy');
+  field.remove();
+  if (!ok) throw new Error('Copying is blocked here. Open the app from your Home Screen icon.');
+}
+
+function wireWidgetSheet() {
+  $('#widget-cta').addEventListener('click', async () => {
+    $('#widget-param-name').textContent = state.name || 'your name';
+    $('#widget-hint').className = 'hint';
+    $('#widget-hint').textContent = '';
+    openSheet('#widget-sheet');
+    // Warm the cache so the copy button is instant and stays inside its gesture.
+    loadWidgetScript().catch(() => {});
+  });
+
+  $('#copy-widget').addEventListener('click', async () => {
+    const hint = $('#widget-hint');
+    hint.className = 'hint';
+    try {
+      const script = await loadWidgetScript();
+      await copyToClipboard(script);
+      hint.textContent = 'Copied. Opening Scriptable, then press and hold and paste.';
+      hint.classList.add('is-good');
+      // Opens Scriptable on a fresh empty script. If it is not installed
+      // nothing happens, which is why step 1 exists.
+      setTimeout(() => {
+        window.location.href = 'scriptable:///add';
+      }, 700);
+    } catch (error) {
+      hint.textContent = error.message;
+      hint.classList.add('is-warning');
+    }
+  });
+}
+
 function wireSheets() {
   $$('[data-close-sheet]').forEach((el) => el.addEventListener('click', closeSheets));
   document.addEventListener('keydown', (event) => {
@@ -486,6 +557,7 @@ async function boot() {
   wireNameScreen();
   wireHomeScreen();
   wireSettingsSheet();
+  wireWidgetSheet();
   wireSheets();
 
   route();

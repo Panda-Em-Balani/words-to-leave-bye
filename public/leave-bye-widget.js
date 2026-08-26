@@ -3,35 +3,35 @@
    =============================================================================
 
    iOS does not let a web app put a widget on the Home Screen. Only native apps
-   can do that. This script is the way around it: the free Scriptable app can
-   host widgets, and it can run this.
+   can do that. Scriptable is a free app that hosts widgets and can run this.
 
-   HOW TO INSTALL IT (about three minutes, once)
-   ---------------------------------------------
+   THE EASY WAY
+   ------------
+   Open Leave, Bye. from your Home Screen, tap the menu, and choose
+   "Add the widget". It copies this script for you with everything already
+   filled in, and opens Scriptable. Then just paste.
+
+   THE MANUAL WAY
+   --------------
    1. Install "Scriptable" from the App Store. It is free.
    2. Open Scriptable, tap + in the top right.
    3. Paste this entire file in. Tap Done. Rename it "Leave, Bye".
-   4. Long-press the Home Screen, tap +, search for Scriptable, and add a
-      MEDIUM widget.
-   5. Long-press the new widget, tap "Edit Widget", then:
+   4. Set BASE_URL below to the app's address.
+   5. Long-press the Home Screen, tap +, find Scriptable, add a MEDIUM widget.
+   6. Long-press the new widget, tap "Edit Widget", then:
         Script     -> Leave, Bye
-        Parameter  -> her name, exactly as she typed it in the app
-   6. Done. It refreshes itself through the day and shows the daily quote.
+        Parameter  -> your name, spelled the way you typed it in the app
 
    The widget quote is deliberately NOT the same as the 8am notification quote,
-   so she gets two different ones a day.
+   so you get two different ones a day.
    ============================================================================= */
 
-// ---------------------------------------------------------------------------
-// SET THIS to your deployed address, with no trailing slash.
-// e.g. "https://words-to-leave-bye.vercel.app"
+// The app rewrites this line for you when it copies the script.
 const BASE_URL = 'https://REPLACE-ME.vercel.app';
-// ---------------------------------------------------------------------------
 
 const INK = new Color('#222121');
-const SLATE = new Color('#332f2f');
-const ASH = new Color('#605553');
 const MARKER = new Color('#073b62');
+const ASH = new Color('#605553');
 const PAPER = new Color('#ffffff');
 
 const CACHE_FILE = 'leave-bye-cache.json';
@@ -91,9 +91,20 @@ async function getQuote(who) {
     if (cached) return { ...cached, stale: true };
     return {
       text: 'No signal, no wisdom. Consider this your sign to look out of a window.',
-      by: null,
+      by: 'Lao Tzu, The Art of Ragebait',
       offline: true,
     };
+  }
+}
+
+/** The panda, if it loads. The widget is fine without it. */
+async function logo() {
+  try {
+    const request = new Request(`${BASE_URL}/icons/icon-192.png`);
+    request.timeoutInterval = 6;
+    return await request.loadImage();
+  } catch {
+    return null;
   }
 }
 
@@ -106,7 +117,7 @@ function sizeFor(text) {
   return text.length > 130 ? 14 : text.length > 80 ? 16 : 19;
 }
 
-function build(quote, who) {
+function build(quote, who, mark) {
   const family = config.widgetFamily || 'medium';
   const small = family === 'small';
 
@@ -124,15 +135,13 @@ function build(quote, who) {
     const header = widget.addStack();
     header.centerAlignContent();
 
-    const mark = header.addStack();
-    mark.backgroundColor = MARKER;
-    mark.cornerRadius = 6;
-    mark.setPadding(2, 6, 2, 6);
-    const markText = mark.addText('L,');
-    markText.font = Font.semiboldRoundedSystemFont(12);
-    markText.textColor = PAPER;
+    if (mark) {
+      const image = header.addImage(mark);
+      image.imageSize = new Size(18, 18);
+      image.cornerRadius = 5;
+      header.addSpacer(8);
+    }
 
-    header.addSpacer(8);
     const label = header.addText(who ? `Morning, ${who}` : 'Words to Leave, Bye.');
     label.font = Font.mediumSystemFont(11);
     label.textColor = new Color('#ffffff', 0.45);
@@ -157,10 +166,14 @@ function build(quote, who) {
   const footer = widget.addStack();
   footer.centerAlignContent();
   const caption = footer.addText(
-    quote.offline ? 'Offline' : quote.stale ? 'Yesterday, still true' : quote.by || 'Leave, Bye.'
+    quote.offline
+      ? 'Offline'
+      : quote.stale
+        ? 'Yesterday, still true'
+        : `— ${quote.by || 'Lao Tzu, The Art of Ragebait'}`
   );
   caption.font = Font.italicSystemFont(small ? 9 : 10);
-  caption.textColor = new Color('#605553', 1);
+  caption.textColor = ASH;
   caption.lineLimit = 1;
   footer.addSpacer();
 
@@ -173,7 +186,8 @@ function build(quote, who) {
 
 const who = name();
 const quote = await getQuote(who);
-const widget = build(quote, who);
+const mark = await logo();
+const widget = build(quote, who, mark);
 
 if (config.runsInWidget) {
   Script.setWidget(widget);

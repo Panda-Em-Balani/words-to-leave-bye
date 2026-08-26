@@ -1,253 +1,91 @@
 /* =============================================================================
    Icon generator.
 
-   Draws the app mark -- a white "L," sitting on a blue highlighter swipe --
-   and writes it out as PNGs. Written with nothing but zlib so the project has
-   no image-processing dependency.
+   Rasterises public/icons/panda.svg into the PNGs the Home Screen, the manifest
+   and the notification badge need.
 
-     node tools/generate-icons.mjs
+     npm run icons
+
+   The generated PNGs are committed, so you only need to run this if you change
+   the logo. It rasterises with headless Chromium via Playwright, which is not a
+   dependency of this project -- install it only if you need it:
+
+     npm install --no-save playwright && npx playwright install chromium
+
+   To swap in a completely different logo, replace public/icons/panda.svg and
+   run this again. Everything else picks it up automatically.
    ============================================================================= */
 
-import { deflateSync } from 'node:zlib';
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const OUT = join(dirname(fileURLToPath(import.meta.url)), '..', 'public', 'icons');
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
+const ICONS = join(ROOT, 'public', 'icons');
 
-const INK = [0x22, 0x21, 0x21, 255];
-const MARKER = [0x07, 0x3b, 0x62, 255];
-const MARKER_LIT = [0x0a, 0x4d, 0x80, 255];
-const PAPER = [0xff, 0xff, 0xff, 255];
-const CLEAR = [0, 0, 0, 0];
+const GROUND = '#f7f4f2'; // warm off-white, the same family as the app's greys
+const LOGO = readFileSync(join(ICONS, 'panda.svg'), 'utf8');
 
-const SS = 3; // supersampling factor, for clean edges without a rasteriser
+/* The notification badge has to be a flat white silhouette on transparency, so
+   it gets the paw on its own -- a whole panda turns to mush at 96px. */
+const PAW = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <g fill="#ffffff">
+    <ellipse cx="50" cy="66" rx="22" ry="18"/>
+    <circle cx="24" cy="36" r="10"/>
+    <circle cx="42" cy="24" r="10.5"/>
+    <circle cx="62" cy="24" r="10.5"/>
+    <circle cx="79" cy="38" r="10"/>
+  </g>
+</svg>`;
 
-/* --- PNG encoding ---------------------------------------------------------- */
-
-const CRC_TABLE = (() => {
-  const table = new Int32Array(256);
-  for (let n = 0; n < 256; n++) {
-    let c = n;
-    for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
-    table[n] = c;
+async function loadPlaywright() {
+  const override = process.env.PLAYWRIGHT_MODULE;
+  try {
+    return await import(override || 'playwright');
+  } catch {
+    console.error(
+      '\n  Playwright is needed to rasterise the logo, and is not installed.\n' +
+        '  It is not a dependency of this project because the icons are already\n' +
+        '  committed -- you only need it if you are changing the logo:\n\n' +
+        '    npm install --no-save playwright && npx playwright install chromium\n'
+    );
+    process.exit(1);
   }
-  return table;
-})();
-
-function crc32(buf) {
-  let c = 0xffffffff;
-  for (let i = 0; i < buf.length; i++) c = CRC_TABLE[(c ^ buf[i]) & 0xff] ^ (c >>> 8);
-  return (c ^ 0xffffffff) >>> 0;
 }
 
-function chunk(type, data) {
-  const head = Buffer.alloc(8);
-  head.writeUInt32BE(data.length, 0);
-  head.write(type, 4, 'ascii');
-  const crc = Buffer.alloc(4);
-  crc.writeUInt32BE(crc32(Buffer.concat([head.subarray(4), data])), 0);
-  return Buffer.concat([head, data, crc]);
-}
-
-function encodePng(pixels, size) {
-  const stride = size * 4;
-  const raw = Buffer.alloc((stride + 1) * size);
-  for (let y = 0; y < size; y++) {
-    raw[y * (stride + 1)] = 0; // filter: none
-    Buffer.from(pixels.buffer, y * stride, stride).copy(raw, y * (stride + 1) + 1);
-  }
-  const ihdr = Buffer.alloc(13);
-  ihdr.writeUInt32BE(size, 0);
-  ihdr.writeUInt32BE(size, 4);
-  ihdr[8] = 8; // bit depth
-  ihdr[9] = 6; // colour type: RGBA
-  return Buffer.concat([
-    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
-    chunk('IHDR', ihdr),
-    chunk('IDAT', deflateSync(raw, { level: 9 })),
-    chunk('IEND', Buffer.alloc(0)),
-  ]);
-}
-
-/* --- Geometry -------------------------------------------------------------- */
-
-/** Rounded rectangle centred on the origin, in an already-rotated space. */
-function inRoundRect(x, y, w, h, r) {
-  const hw = w / 2 - r;
-  const hh = h / 2 - r;
-  const dx = Math.max(Math.abs(x) - hw, 0);
-  const dy = Math.max(Math.abs(y) - hh, 0);
-  return dx * dx + dy * dy <= r * r && Math.abs(x) <= w / 2 && Math.abs(y) <= h / 2;
-}
-
-function inCircle(x, y, cx, cy, r) {
-  const dx = x - cx;
-  const dy = y - cy;
-  return dx * dx + dy * dy <= r * r;
-}
-
-/**
- * A comma drawn the way a pen draws one: a round bowl that tapers away along a
- * curve. Modelled as a run of shrinking circles so the join is never a seam.
- * Memoised, because this runs once per subpixel sample.
- */
-const strokeCache = new Map();
-function commaStroke(cx, cy, r, baseline) {
-  const key = cx + '|' + cy + '|' + r;
-  const hit = strokeCache.get(key);
-  if (hit) return hit;
-
-  const p0 = [cx, cy];
-  const p1 = [cx + r * 0.62, baseline + r * 0.25];
-  const p2 = [cx - r * 1.05, baseline + r * 1.60];
-
-  const points = [];
-  const STEPS = 26;
-  for (let i = 0; i <= STEPS; i++) {
-    // Stops just short of the mathematical tip: the last few circles would
-    // land under a pixel and alias into a dotted trail.
-    const t = (i / STEPS) * 0.88;
-    const mt = 1 - t;
-    points.push([
-      mt * mt * p0[0] + 2 * mt * t * p1[0] + t * t * p2[0],
-      mt * mt * p0[1] + 2 * mt * t * p1[1] + t * t * p2[1],
-      Math.max(r * Math.pow(mt, 1.15), r * 0.11),
-    ]);
-  }
-  strokeCache.set(key, points);
-  return points;
-}
-
-/**
- * The mark itself, evaluated one sample at a time.
- * `inset` shrinks the artwork for maskable icons, which get cropped by the OS.
- */
-function sample(px, py, size, { inset = 1, transparent = false } = {}) {
-  const cx = size / 2;
-  const cy = size / 2;
-
-  // Rotate into the highlighter's own frame: a real swipe is never level.
-  const angle = (-7 * Math.PI) / 180;
-  const cos = Math.cos(-angle);
-  const sin = Math.sin(-angle);
-  const ox = px - cx;
-  const oy = py - cy;
-  const x = ox * cos - oy * sin;
-  const y = ox * sin + oy * cos;
-
-  const bandW = size * 0.78 * inset;
-  const bandH = size * 0.40 * inset;
-
-  let colour = transparent ? CLEAR : INK;
-
-  if (inRoundRect(x, y, bandW, bandH, bandH * 0.30)) {
-    // A soft left-to-right lift, the way ink pools unevenly.
-    const t = (x + bandW / 2) / bandW;
-    const lift = Math.sin(t * Math.PI) * 0.55;
-    colour = [
-      Math.round(MARKER[0] + (MARKER_LIT[0] - MARKER[0]) * lift),
-      Math.round(MARKER[1] + (MARKER_LIT[1] - MARKER[1]) * lift),
-      Math.round(MARKER[2] + (MARKER_LIT[2] - MARKER[2]) * lift),
-      255,
-    ];
-  }
-
-  // --- the glyph: L,
-  const gh = bandH * 0.58;          // cap height
-  const t = bandH * 0.150;          // stroke weight
-  const footW = gh * 0.48;
-  const commaR = t * 0.72;
-  const gap = t * 0.95;
-
-  // The L is as wide as its foot; the comma hangs off the end of it.
-  const glyphW = footW + gap + commaR * 2;
-  const left = -glyphW / 2;
-  const top = -gh / 2;
-  const baseline = top + gh;
-
-  // stem of the L
-  if (inRoundRect(x - (left + t / 2), y - (top + gh / 2), t, gh, t * 0.34)) colour = PAPER;
-  // foot of the L
-  if (inRoundRect(x - (left + footW / 2), y - (baseline - t / 2), footW, t, t * 0.34)) colour = PAPER;
-
-  // The comma: a round bowl sitting on the baseline, with a tail that tapers
-  // down and to the left, the way a written comma actually falls.
-  const commaX = left + footW + gap + commaR;
-  const commaY = baseline - commaR;
-  for (const [sx, sy, sr] of commaStroke(commaX, commaY, commaR, baseline)) {
-    if (inCircle(x, y, sx, sy, sr)) {
-      colour = PAPER;
-      break;
-    }
-  }
-
-  return colour;
-}
-
-/* --- Rendering ------------------------------------------------------------- */
-
-function render(size, options = {}) {
-  const hi = size * SS;
-  const out = new Uint8Array(size * size * 4);
-
-  for (let y = 0; y < size; y++) {
-    for (let x = 0; x < size; x++) {
-      let r = 0;
-      let g = 0;
-      let b = 0;
-      let a = 0;
-      for (let sy = 0; sy < SS; sy++) {
-        for (let sx = 0; sx < SS; sx++) {
-          const px = ((x * SS + sx + 0.5) / hi) * size;
-          const py = ((y * SS + sy + 0.5) / hi) * size;
-          const c = sample(px, py, size, options);
-          r += c[0] * c[3];
-          g += c[1] * c[3];
-          b += c[2] * c[3];
-          a += c[3];
-        }
-      }
-      const i = (y * size + x) * 4;
-      if (a === 0) {
-        out[i] = out[i + 1] = out[i + 2] = out[i + 3] = 0;
-      } else {
-        out[i] = Math.round(r / a);
-        out[i + 1] = Math.round(g / a);
-        out[i + 2] = Math.round(b / a);
-        out[i + 3] = Math.round(a / (SS * SS));
-      }
-    }
-  }
-  return out;
-}
-
-/** The notification badge is a flat white silhouette on transparency. */
-function renderBadge(size) {
-  const pixels = render(size, { transparent: true, inset: 1.1 });
-  for (let i = 0; i < pixels.length; i += 4) {
-    if (pixels[i + 3] > 0) {
-      pixels[i] = 255;
-      pixels[i + 1] = 255;
-      pixels[i + 2] = 255;
-    }
-  }
-  return pixels;
+/** One icon: the logo centred on a ground, at `scale` of the canvas. */
+function markup(svg, size, { ground, scale }) {
+  return `<body style="margin:0;width:${size}px;height:${size}px;background:${ground || 'transparent'};display:grid;place-items:center">
+    <div style="width:${Math.round(size * scale)}px;display:flex">${svg}</div>
+  </body>`;
 }
 
 const targets = [
-  ['icon-180.png', () => render(180)],
-  ['icon-192.png', () => render(192)],
-  ['icon-512.png', () => render(512)],
-  ['icon-maskable-512.png', () => render(512, { inset: 0.72 })],
-  ['badge-96.png', () => renderBadge(96)],
+  // Apple applies its own rounded mask, so these go edge to edge.
+  ['icon-180.png', LOGO, { ground: GROUND, scale: 0.76 }],
+  ['icon-192.png', LOGO, { ground: GROUND, scale: 0.76 }],
+  ['icon-512.png', LOGO, { ground: GROUND, scale: 0.76 }],
+  // Maskable icons get cropped by the OS, so the art sits inside the safe zone.
+  ['icon-maskable-512.png', LOGO, { ground: GROUND, scale: 0.56 }],
+  ['badge-96.png', PAW, { ground: null, scale: 0.82 }],
 ];
 
-mkdirSync(OUT, { recursive: true });
-for (const [name, draw] of targets) {
+const { chromium } = await loadPlaywright();
+const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
+
+mkdirSync(ICONS, { recursive: true });
+for (const [name, svg, options] of targets) {
   const size = Number(name.match(/(\d+)\.png$/)[1]);
-  const png = encodePng(draw(), size);
-  writeFileSync(join(OUT, name), png);
+  const page = await browser.newPage({
+    viewport: { width: size, height: size },
+    deviceScaleFactor: 1,
+  });
+  await page.setContent(markup(svg, size, options));
+  const png = await page.screenshot({ omitBackground: !options.ground });
+  await page.close();
+  writeFileSync(join(ICONS, name), png);
   console.log(`  ${name.padEnd(24)} ${size}x${size}  ${(png.length / 1024).toFixed(1)} KB`);
 }
+
+await browser.close();
 console.log('\nIcons written to public/icons/');
