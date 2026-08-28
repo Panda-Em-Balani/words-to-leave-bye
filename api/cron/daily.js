@@ -1,8 +1,11 @@
 import { cors, json, query, authorizeCron } from '../_shared.js';
-import { listSubscribers, claimSendSlot, lastSent, getPinned, isPersistent, claimOpening } from '../../lib/store.js';
+import {
+  listSubscribers, claimSendSlot, lastSent, getPinned, isPersistent, claimOpening,
+  usedQuotes, markQuoteUsed, resetUsedQuotes,
+} from '../../lib/store.js';
 import { sendToAll, pushIsConfigured } from '../../lib/push.js';
-import { QUOTES, FIRST_QUOTE } from '../../public/quotes.js';
-import { quoteForDate, dateKey, personalise } from '../../public/daily.js';
+import { QUOTES, FIRST_QUOTE, DEFAULT_BY } from '../../public/quotes.js';
+import { nextUnused, dateKey, personalise, fingerprint } from '../../public/daily.js';
 
 /**
  * The 8am job.
@@ -41,16 +44,40 @@ export default async function handler(req, res) {
   const opening =
     !pinned && subscribers.length && (await claimOpening()) ? FIRST_QUOTE.notification : null;
 
+  /* The deck says which quote is next; the ledger says which ones she has
+     already had. Everyone gets the same one -- it is chosen here, once, not
+     per subscriber. */
+  let chosen = pinned || opening;
+  let lapped = false;
+  if (!chosen) {
+    const used = await usedQuotes();
+    chosen = nextUnused(QUOTES, { key, stream: 'notification', used });
+    if (!chosen) {
+      // Every quote in the book has been sent. Start it again.
+      await resetUsedQuotes();
+      chosen = nextUnused(QUOTES, { key, stream: 'notification' });
+      lapped = true;
+    }
+  }
+
   const results = await sendToAll(subscribers, (record) =>
-    buildPayload(key, record.name, pinned || opening)
+    buildPayload(key, record.name, chosen)
   );
 
   const sent = results.filter((r) => r.ok).length;
+
+  /* Spent only once it has actually landed somewhere. A morning that reached
+     nobody has not used the quote up, so it comes round again tomorrow rather
+     than being lost to a bad deploy. Pins and the opening line are not part of
+     the deck, so they are never recorded against it. */
+  if (sent && !pinned && !opening) await markQuoteUsed(fingerprint(chosen.text));
+
   json(res, 200, {
     ok: true,
     date: key,
     pinned: Boolean(pinned),
     opening: Boolean(opening),
+    lapped,
     subscribers: subscribers.length,
     sent,
     failed: results.length - sent,
@@ -58,11 +85,8 @@ export default async function handler(req, res) {
   });
 }
 
-/** `override` is a pinned quote or the one-off opening line, when either applies. */
-function buildPayload(key, name, override) {
-  const quote = override
-    ? { text: personalise(override.text, name), by: override.by }
-    : quoteForDate(QUOTES, { key, stream: 'notification', name });
+function buildPayload(key, name, chosen) {
+  const quote = { text: personalise(chosen.text, name), by: chosen.by || DEFAULT_BY };
   return {
     // iOS prints the app's own name above this, so the title is the second
     // line of the three and the quote is the third.

@@ -1,8 +1,8 @@
 import { cors, json, readJson, cleanName } from './_shared.js';
-import { getSubscriber } from '../lib/store.js';
+import { getSubscriber, usedQuotes, nextTestTicket } from '../lib/store.js';
 import { sendTo, pushIsConfigured } from '../lib/push.js';
-import { QUOTES } from '../public/quotes.js';
-import { quoteForDate, dateKey } from '../public/daily.js';
+import { QUOTES, DEFAULT_BY } from '../public/quotes.js';
+import { rotate, personalise, fingerprint } from '../public/daily.js';
 
 /**
  * Fires one notification straight away, so the setup can be proved without
@@ -21,14 +21,30 @@ export default async function handler(req, res) {
   if (!record) return json(res, 404, { error: 'That device is not subscribed.' });
 
   const name = cleanName(body.name) || record.name;
-  // Pulls tomorrow's notification quote so a test never spoils today's real one.
-  const tomorrow = new Date(Date.now() + 86400000);
-  const quote = quoteForDate(QUOTES, { key: dateKey(tomorrow), stream: 'notification', name });
+
+  /* A test must not spend a morning.
+
+     This used to send tomorrow's quote, on the reasoning that it would not
+     spoil today's. It spoiled tomorrow's instead -- every test guaranteed a
+     repeat the following morning, which is exactly the bug this replaced.
+
+     So a test draws from the quotes she has already been sent: whatever it
+     picks, she has seen it before and the schedule keeps everything it still
+     owes her. Before the first real push there is nothing used yet, so it
+     falls back to the whole book -- the only case where a test can show
+     something the schedule has not reached, and only until the first morning.
+
+     A counter, not the clock, walks the pool: two taps are always two
+     different quotes, however fast they come. */
+  const used = await usedQuotes();
+  const seen = QUOTES.filter((q) => used.has(fingerprint(q.text)));
+  const pool = seen.length ? seen : QUOTES;
+  const quote = pool[rotate(pool.length, await nextTestTicket(), 'test')];
 
   const result = await sendTo(record, {
     title: 'From your Bestfriend',
-    body: quote.text,
-    by: quote.by,
+    body: personalise(quote.text, name),
+    by: quote.by || DEFAULT_BY,
     tag: 'wtlb-test',
     url: '/?from=test',
   });

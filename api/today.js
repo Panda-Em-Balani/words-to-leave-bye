@@ -12,6 +12,10 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return json(res, 204, {});
 
   const q = query(req);
+  /* The app and the widget both ask for "widget". "notification" answers with
+     the deck's own pick, which is a prediction, not a record: what actually
+     went out at 8am is whatever the ledger let through, and only the cron
+     knows that. Nothing asks for it today. */
   const stream = q.stream === 'notification' ? 'notification' : 'widget';
   const key = /^\d{4}-\d{2}-\d{2}$/.test(q.date || '') ? q.date : dateKey();
   const name = cleanName(q.name);

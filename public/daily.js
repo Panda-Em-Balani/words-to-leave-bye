@@ -12,8 +12,13 @@
    she gets two different quotes a day.
 
    Quotes are drawn as a shuffled deck: every quote is used exactly once before
-   any of them repeats. With 200 quotes that is a fresh quote every day for
-   200 days per stream.
+   any of them repeats, so the gap between two showings of the same quote is
+   exactly as long as the book.
+
+   The deck is shuffled once per stream and then walked forever. It used to be
+   reseeded every time it ran out, which looked tidier but broke the promise at
+   the seam: a quote at the end of one deck could land at the start of the next
+   and come round again the following morning.
    ----------------------------------------------------------------------------- */
 
 import { DEFAULT_BY } from './quotes.js';
@@ -70,15 +75,50 @@ function deck(n, seed) {
 }
 
 /**
- * Which quote index belongs to this date on this stream.
- * Reshuffles into a brand new deck once every quote has been used.
+ * Step `counter` places into this stream's deck. One deck per stream, fixed
+ * for good, so consecutive counters always give different quotes and the same
+ * quote comes back only after a full lap of the book.
  */
-export function indexForDate(total, key, stream = 'notification') {
+export function rotate(total, counter, stream = 'notification') {
   if (total <= 0) return 0;
-  const day = dayNumber(key);
-  const cycle = Math.floor(day / total);
-  const position = ((day % total) + total) % total;
-  return deck(total, hash32(`${stream}#${cycle}`))[position];
+  const position = ((counter % total) + total) % total;
+  return deck(total, hash32(stream))[position];
+}
+
+/** Which quote index belongs to this date on this stream. */
+export function indexForDate(total, key, stream = 'notification') {
+  return rotate(total, dayNumber(key), stream);
+}
+
+/**
+ * A stable id for a quote, taken from its own text.
+ *
+ * The ledger of what has already been sent is keyed on these rather than on
+ * array positions: positions move whenever the book is edited, and a quote
+ * that shifted position would look unsent and go out twice.
+ */
+export function fingerprint(text) {
+  return hash32(String(text)).toString(36);
+}
+
+/**
+ * The next quote this stream owes, skipping any the ledger says have gone out.
+ *
+ * On an ordinary morning the deck's own pick is unused and comes straight
+ * back. Walking forward only happens when something else already spent that
+ * quote -- a hand-pinned day, or an edit to the book that moved the deck under
+ * us. Returns null when every quote has been used, which is the caller's cue
+ * to wipe the ledger and start the book again.
+ */
+export function nextUnused(quotes, { key = dateKey(), stream = 'notification', used } = {}) {
+  const total = quotes.length;
+  if (!total) return null;
+  const start = dayNumber(key);
+  for (let step = 0; step < total; step++) {
+    const quote = quotes[rotate(total, start + step, stream)];
+    if (!used || !used.has(fingerprint(quote.text))) return quote;
+  }
+  return null;
 }
 
 /** Swap {name} for her name. Handles missing/blank names gracefully. */

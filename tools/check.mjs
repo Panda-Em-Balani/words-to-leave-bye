@@ -52,14 +52,41 @@ check(
   stray.length ? `check: "${stray[0].text}"` : 'only {name} is used'
 );
 
-/* --- rotation -------------------------------------------------------------- */
+/* --- rotation ----------------------------------------------------------------
+   The promise: a quote never comes round twice inside one lap of the book.
 
-const start = Math.ceil(Date.now() / 86400000 / QUOTES.length) * QUOTES.length;
-const seen = new Set();
-for (let i = 0; i < QUOTES.length; i++) {
-  seen.add(indexForDate(QUOTES.length, new Date((start + i) * 86400000).toISOString().slice(0, 10), 'notification'));
+   The old check lined its window up with a deck boundary, which is the one
+   place the old code broke -- it reshuffled there, and a quote could land at
+   the end of one deck and the start of the next. So this starts on an ordinary
+   day, walks five years, and measures the real gap between every pair of
+   showings on both streams. */
+
+const N = QUOTES.length;
+const from = Math.floor(Date.now() / 86400000);
+const keyFor = (d) => new Date(d * 86400000).toISOString().slice(0, 10);
+
+let closest = Infinity;
+let where = '';
+for (const stream of ['notification', 'widget']) {
+  const lastSeen = new Map();
+  for (let d = from; d < from + 365 * 5; d++) {
+    const i = indexForDate(N, keyFor(d), stream);
+    if (lastSeen.has(i) && d - lastSeen.get(i) < closest) {
+      closest = d - lastSeen.get(i);
+      where = stream;
+    }
+    lastSeen.set(i, d);
+  }
 }
-check('No repeats before the whole book is used', seen.size === QUOTES.length, `${seen.size}/${QUOTES.length} distinct`);
+check(
+  `No repeat inside ${N} days`,
+  closest >= N,
+  closest === Infinity ? 'never repeats' : `closest pair is ${closest} days apart (${where})`
+);
+
+const distinct = new Set();
+for (let i = 0; i < N; i++) distinct.add(indexForDate(N, keyFor(from + i), 'notification'));
+check('One lap uses the whole book', distinct.size === N, `${distinct.size}/${N} distinct`);
 
 const today = dateKey();
 const morning = quoteForDate(QUOTES, { key: today, stream: 'notification', name: 'Sara' });
