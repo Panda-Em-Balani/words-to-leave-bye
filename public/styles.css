@@ -169,13 +169,18 @@ body {
    The wordmark. One lockup: the small line and the big highlighted line are
    set in the same face and optically aligned, so they read as a single title
    rather than a label sitting above a heading.
+
+   Two things keep it straight. The swipe is a solid block of ink and the eye
+   locks onto its left edge, so that edge -- not the L inside it -- is what
+   lines up with the W above. And the ink gets real air above it: at a two
+   pixel gap the swipe crowded the line above and the pair read as one smudge.
    ----------------------------------------------------------------------------- */
 
 .wordmark {
+  --mark-size: clamp(41px, 12.4vw, 60px);
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
   font-family: var(--font-quote);
   font-weight: 700;
   letter-spacing: -0.025em;
@@ -187,20 +192,21 @@ body {
   color: var(--paper-dim);
   font-weight: 600;
   letter-spacing: -0.015em;
-  /* Nudged right so the quote mark below hangs into the margin and the two
-     lines share an optical left edge. */
-  padding-left: 0.06em;
+  /* Clear of the swipe below. Without this the ink sits on the descenders. */
+  margin-bottom: 14px;
 }
 
 .wordmark-main {
-  font-size: clamp(41px, 12.4vw, 60px);
-  /* The highlighter needs a little room above and below, or the swipe clips
-     against the line above it. */
-  padding: 2px 0 4px;
+  font-size: var(--mark-size);
+  line-height: 1.14;
+  /* The swipe bleeds 0.06em past the glyphs on each side (see .hl). Pushing
+     the whole line right by exactly that much puts the ink's left edge under
+     the W of "Words to:" instead of half a character to its left. */
+  padding-left: calc(var(--mark-size) * 0.06);
 }
 
 .wordmark-aside {
-  margin: -8px 0 0;
+  margin: 12px 0 0;
   font-size: 14.5px;
   line-height: 1.5;
   font-style: italic;

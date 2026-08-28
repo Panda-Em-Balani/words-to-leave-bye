@@ -316,8 +316,10 @@ function wireInstallScreen() {
       return;
     }
     if (!env.isIOS) {
-      $('#sheet-note').textContent =
+      const note = $('#sheet-note');
+      note.textContent =
         'On Android open the browser menu, then Install app or Add to Home screen.';
+      note.hidden = false;
     }
     openSheet('#install-sheet');
   });
