@@ -12,6 +12,11 @@ export default async function handler(req, res) {
     vapidPublicKey: vapidPublicKey(),
     pushReady: pushIsConfigured(),
     storageReady: isPersistent(),
+    /* Whether the console has a key at all -- not the key itself. Vercel masks
+       env values in its dashboard, so a variable that was saved empty looks
+       exactly like one that was saved properly. This tells them apart. It
+       gives nothing away: the console already answers 401 either way. */
+    consoleReady: Boolean(process.env.ADMIN_KEY),
     timeZone: TIME_ZONE,
     sendHour: SEND_HOUR,
     quoteCount: QUOTE_COUNT,
