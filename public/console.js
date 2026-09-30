@@ -74,6 +74,14 @@ function renderStatus(status) {
     `<strong>${status.subscribers}</strong> device${status.subscribers === 1 ? '' : 's'} subscribed`,
     `Today in Dubai is <strong>${status.today}</strong>`,
   ];
+  if (status.lastDelivered) {
+    bits.push(
+      `Last morning delivered: <strong>${status.lastDelivered}</strong>` +
+      ` &middot; ${status.quotesUsed} of ${status.quoteCount} quotes used`
+    );
+  } else {
+    bits.push('The 8am job has <strong>not run yet</strong>.');
+  }
   if (!status.pushReady) bits.push('Push is <strong>not configured</strong>, so nothing can be sent.');
   if (!status.storageReady) bits.push('Storage is <strong>not connected</strong>, so nothing can be pinned.');
   $('#status').innerHTML = bits.join('<br>');

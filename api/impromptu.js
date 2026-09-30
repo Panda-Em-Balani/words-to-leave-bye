@@ -1,7 +1,9 @@
 import { cors, json, query, readJson, cleanQuote, cleanName, authorizeAdmin } from './_shared.js';
-import { listSubscribers, pinQuote, getPinned, clearPinned, isPersistent } from '../lib/store.js';
+import {
+  listSubscribers, pinQuote, getPinned, clearPinned, isPersistent, lastSent, usedQuotes,
+} from '../lib/store.js';
 import { sendToAll, pushIsConfigured } from '../lib/push.js';
-import { DEFAULT_BY } from '../public/quotes.js';
+import { DEFAULT_BY, QUOTE_COUNT } from '../public/quotes.js';
 import { dateKey, personalise } from '../public/daily.js';
 
 /**
@@ -82,10 +84,18 @@ async function status(res) {
   const today = dateKey();
   const tomorrow = dateKey(new Date(Date.now() + 86400000));
   const subscribers = isPersistent() ? await listSubscribers() : [];
+  /* Whether the 8am job has ever actually run, and how far through the book it
+     has got. Without this the only way to know a morning went out is to have
+     been holding the phone at the time. */
+  const delivered = isPersistent() ? await lastSent() : null;
+  const used = isPersistent() ? (await usedQuotes()).size : 0;
   json(res, 200, {
     ok: true,
     today,
     tomorrow,
+    lastDelivered: delivered,
+    quotesUsed: used,
+    quoteCount: QUOTE_COUNT,
     storageReady: isPersistent(),
     pushReady: pushIsConfigured(),
     subscribers: subscribers.length,
