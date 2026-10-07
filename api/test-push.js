@@ -18,7 +18,12 @@ export default async function handler(req, res) {
   if (!body.endpoint) return json(res, 400, { error: 'endpoint is required' });
 
   const record = await getSubscriber(body.endpoint);
-  if (!record) return json(res, 404, { error: 'That device is not subscribed.' });
+  if (!record) {
+    return json(res, 404, {
+      code: 'not-subscribed',
+      error: 'That device is not subscribed.',
+    });
+  }
 
   const name = cleanName(body.name) || record.name;
 

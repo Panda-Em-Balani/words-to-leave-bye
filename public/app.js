@@ -97,7 +97,12 @@ async function api(path, options = {}) {
     ...options,
   });
   const body = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(body.error || `Request failed (${res.status})`);
+  if (!res.ok) {
+    const error = new Error(body.error || `Request failed (${res.status})`);
+    error.status = res.status;
+    error.code = body.code;
+    throw error;
+  }
   return body;
 }
 
@@ -250,6 +255,35 @@ async function enablePush() {
 
   await syncSubscription();
   return state.subscription;
+}
+
+/**
+ * Keeps the server's copy of this device alive.
+ *
+ * The server forgets a device when the push service retires it, or when its
+ * storage was not connected at the moment she signed up. Before this, nothing
+ * ever told it again: once permission was granted the "turn on" button hid
+ * itself, so a forgotten device failed "Send one now" for good with no way out.
+ *
+ * Already-granted permission means this never prompts. It reuses the existing
+ * subscription or makes a fresh one, then re-registers it -- the server treats
+ * that as an upsert, so doing it again is harmless.
+ */
+let lastHeal = 0;
+async function healSubscription({ force = false } = {}) {
+  if (!env.supportsPush || !env.pushAvailableHere) return false;
+  if (Notification.permission !== 'granted') return false;
+  if (localStorage.getItem(STORE.onboarded) !== '1' || !state.name) return false;
+  // Not on every glance at the app. Ten minutes is plenty to repair a gap.
+  if (!force && Date.now() - lastHeal < 10 * 60 * 1000) return false;
+  lastHeal = Date.now();
+  try {
+    await enablePush();
+    return true;
+  } catch {
+    /* offline, or the server is down. Next time. */
+    return false;
+  }
 }
 
 /** Pushes the current subscription plus name up to the server. */
@@ -456,13 +490,24 @@ function wireSettingsSheet() {
     hint.className = 'hint';
     hint.textContent = 'Sending...';
     try {
-      const registration = state.registration || (await navigator.serviceWorker.getRegistration());
-      const subscription = registration && (await registration.pushManager.getSubscription());
-      if (!subscription) throw new Error('Not subscribed on this device yet.');
-      await api('/api/test-push', {
-        method: 'POST',
-        body: JSON.stringify({ endpoint: subscription.endpoint, name: state.name }),
-      });
+      const send = async () => {
+        const reg = state.registration || (await navigator.serviceWorker.getRegistration());
+        const sub = reg && (await reg.pushManager.getSubscription());
+        if (!sub) throw new Error('Not subscribed on this device yet.');
+        return api('/api/test-push', {
+          method: 'POST',
+          body: JSON.stringify({ endpoint: sub.endpoint, name: state.name }),
+        });
+      };
+      try {
+        await send();
+      } catch (error) {
+        // The server has lost this device. Sign it up again and retry once,
+        // rather than leaving her staring at the same error.
+        const lost = error.code === 'not-subscribed' || error.message.startsWith('Not subscribed');
+        if (!lost || !(await healSubscription({ force: true }))) throw error;
+        await send();
+      }
       hint.textContent = 'Sent. Go look at your lock screen.';
       hint.classList.add('is-good');
     } catch (error) {
@@ -568,6 +613,7 @@ async function boot() {
   registerServiceWorker();
   loadConfig();
   refreshPinned();
+  healSubscription();
 
   // Coming back to the app on a new day should show the new quote.
   let shownFor = dateKey();
@@ -579,6 +625,7 @@ async function boot() {
       renderHome();
     }
     refreshPinned();
+    healSubscription();
   });
 }
 
